@@ -1,0 +1,7 @@
+{
+  "name": "calidad-cloud-test-ionic",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
