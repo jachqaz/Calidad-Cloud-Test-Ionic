@@ -100,9 +100,9 @@ export class GenreSelectionPage implements OnInit {
   }
 
   async ngOnInit() {
-    const fromSettings = this.route.snapshot.queryParams['fromSettings'];
+    const isFromSettings = this.router.url.includes('/settings/genre-selection');
 
-    if (!fromSettings) {
+    if (!isFromSettings) {
       // Check if genres already selected
       const existing = await this.storage.getSelectedGenres();
       if (existing.length === 4) {
@@ -112,7 +112,7 @@ export class GenreSelectionPage implements OnInit {
     }
 
     // Load existing selection if from settings
-    if (fromSettings) {
+    if (isFromSettings) {
       const existing = await this.storage.getSelectedGenres();
       this.selectedGenres.set(existing);
     }
@@ -140,15 +140,15 @@ export class GenreSelectionPage implements OnInit {
       try {
         await this.storage.saveSelectedGenres(this.selectedGenres());
 
-        const fromSettings = this.route.snapshot.queryParams['fromSettings'];
-        const targetRoute = fromSettings ? '/settings' : '/home';
-
-        // Use setTimeout to ensure the database operation completes
-        setTimeout(async () => {
-          await this.router.navigate([targetRoute]);
-        }, 100);
+        const isFromSettings = this.router.url.includes('/settings/genre-selection');
+        if (isFromSettings) {
+          this.router.navigate(['/settings']);
+        } else {
+          this.router.navigate(['/home']);
+        }
       } catch (error) {
         console.error('Error saving genres or navigating:', error);
+        this.router.navigate(['/home']);
       }
     }
   }

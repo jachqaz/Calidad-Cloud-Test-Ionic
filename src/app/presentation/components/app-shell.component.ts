@@ -10,31 +10,29 @@ import {bookmarksOutline, homeOutline, searchOutline, settingsOutline} from 'ion
   standalone: true,
   imports: [IonicModule, CommonModule, RouterModule],
   template: `
-    <ion-app>
-      <ion-split-pane contentId="main-content">
-        <ion-menu contentId="main-content" type="overlay">
-          <ion-content>
-            <ion-list id="inbox-list">
-              <ion-list-header>Biblioteca</ion-list-header>
+    <ion-split-pane contentId="main-content">
+      <ion-menu contentId="main-content" type="overlay">
+        <ion-content>
+          <ion-list id="inbox-list">
+            <ion-list-header>Biblioteca</ion-list-header>
 
-              <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; trackBy: trackItems">
-                <ion-item
-                  routerDirection="root"
-                  [routerLink]="[p.url]"
-                  lines="none"
-                  detail="false"
-                  routerLinkActive="selected">
-                  <ion-icon aria-hidden="true" slot="start" [name]="p.icon"></ion-icon>
-                  <ion-label>{{ p.title }}</ion-label>
-                </ion-item>
-              </ion-menu-toggle>
-            </ion-list>
-          </ion-content>
-        </ion-menu>
+            <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; trackBy: trackItems">
+              <ion-item
+                routerDirection="root"
+                [routerLink]="[p.url]"
+                lines="none"
+                detail="false"
+                routerLinkActive="selected">
+                <ion-icon aria-hidden="true" slot="start" [name]="p.icon"></ion-icon>
+                <ion-label>{{ p.title }}</ion-label>
+              </ion-item>
+            </ion-menu-toggle>
+          </ion-list>
+        </ion-content>
+      </ion-menu>
 
-        <ion-router-outlet id="main-content"></ion-router-outlet>
-      </ion-split-pane>
-    </ion-app>
+      <ion-router-outlet id="main-content"></ion-router-outlet>
+    </ion-split-pane>
   `,
   styles: [`
     ion-menu ion-content {

@@ -13,6 +13,9 @@ import {StorageService} from '../../data/services/storage.service';
   template: `
     <ion-header [translucent]="true">
       <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-menu-button></ion-menu-button>
+        </ion-buttons>
         <ion-title>Open Library Manager</ion-title>
         <ion-buttons slot="end">
           <ion-button (click)="openSearch()">

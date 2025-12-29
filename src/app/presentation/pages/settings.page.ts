@@ -13,7 +13,7 @@ import {StorageService} from '../../data/services/storage.service';
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button defaultHref="/home"></ion-back-button>
+          <ion-menu-button></ion-menu-button>
         </ion-buttons>
         <ion-title>Configuración</ion-title>
       </ion-toolbar>
@@ -77,8 +77,6 @@ export class SettingsPage implements OnInit {
   }
 
   openGenreSelection() {
-    this.router.navigate(['/genre-selection'], {
-      queryParams: {fromSettings: true}
-    });
+    this.router.navigate(['/settings/genre-selection']);
   }
 }
