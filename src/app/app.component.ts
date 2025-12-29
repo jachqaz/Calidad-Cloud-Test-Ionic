@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
-import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
+import {Component} from '@angular/core';
+import {AppShell} from './presentation/components/app-shell.component';
 
 @Component({
   selector: 'app-root',
-  templateUrl: 'app.component.html',
-  imports: [IonApp, IonRouterOutlet],
+  template: '<app-shell></app-shell>',
+  imports: [AppShell],
 })
 export class AppComponent {
   constructor() {}

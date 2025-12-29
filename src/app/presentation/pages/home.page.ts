@@ -4,6 +4,7 @@ import {IonicModule} from '@ionic/angular';
 import {Router} from '@angular/router';
 import {LibraryFacadeService} from '../services/library-facade.service';
 import {BookEntity} from '../../domain/models';
+import {StorageService} from '../../data/services/storage.service';
 
 @Component({
   selector: 'app-home',
@@ -43,7 +44,7 @@ import {BookEntity} from '../../domain/models';
         </div>
 
         <!-- Books List -->
-        <div class="books-section" *ngIf="libraryFacade.bookState.hasBooks()">
+        <div class="books-section" *ngIf="libraryFacade.bookState.hasBooks() || libraryFacade.bookState.isLoading()">
           <h2>{{ selectedGenreTitle() }}</h2>
 
           <!-- Loading Skeletons -->
@@ -60,7 +61,7 @@ import {BookEntity} from '../../domain/models';
           </div>
 
           <!-- Books Grid -->
-          <div *ngIf="!libraryFacade.bookState.isLoading()" class="books-grid">
+          <div *ngIf="!libraryFacade.bookState.isLoading() && libraryFacade.bookState.hasBooks()" class="books-grid">
             @for(book of libraryFacade.bookState.books(); track book.id) {
             <ion-card
               (click)="openBookDetail(book)"
@@ -78,8 +79,17 @@ import {BookEntity} from '../../domain/models';
             }
           </div>
 
+          <!-- No Books Message -->
+          <div *ngIf="!libraryFacade.bookState.isLoading() && !libraryFacade.bookState.hasBooks() && selectedGenre()"
+               class="no-books">
+            <ion-icon name="library-outline" size="large"></ion-icon>
+            <h3>No books found</h3>
+            <p>No books available for {{ selectedGenreTitle() }}</p>
+          </div>
+
           <!-- Infinite Scroll -->
           <ion-infinite-scroll
+            *ngIf="libraryFacade.bookState.hasBooks()"
             (ionInfinite)="loadMore($event)"
             [disabled]="!canLoadMore()">
             <ion-infinite-scroll-content
@@ -106,41 +116,43 @@ export class HomePage implements OnInit {
   selectedGenreTitle = signal<string>('');
   skeletonItems = Array(6).fill(0);
 
-  genres = signal([
-    {
-      key: 'fiction',
-      name: 'Fiction',
-      description: 'Imaginative stories',
-      icon: 'book-outline'
-    },
-    {
-      key: 'science',
-      name: 'Science',
-      description: 'Scientific knowledge',
-      icon: 'flask-outline'
-    },
-    {
-      key: 'history',
-      name: 'History',
-      description: 'Past events',
-      icon: 'time-outline'
-    },
-    {
-      key: 'biography',
-      name: 'Biography',
-      description: 'Life stories',
-      icon: 'person-outline'
-    }
-  ]);
+  genres = signal<any[]>([]);
 
   constructor(
     protected libraryFacade: LibraryFacadeService,
-    private router: Router
+    private router: Router,
+    private storage: StorageService
   ) {
   }
 
-  ngOnInit() {
-    this.loadGenre('fiction');
+  async ngOnInit() {
+    await this.loadSelectedGenres();
+    if (this.genres().length > 0) {
+      this.loadGenre(this.genres()[0].key);
+    }
+  }
+
+  async loadSelectedGenres() {
+    const selectedGenres = await this.storage.getSelectedGenres();
+    const genreIcons = {
+      'arts': 'color-palette-outline',
+      'fiction': 'book-outline',
+      'science': 'flask-outline',
+      'history': 'time-outline',
+      'biography': 'person-outline',
+      'technology': 'laptop-outline',
+      'philosophy': 'bulb-outline',
+      'medicine': 'medical-outline'
+    };
+
+    const genresWithIcons = selectedGenres.map(genre => ({
+      key: genre.key,
+      name: genre.name,
+      description: `Explore ${genre.name.toLowerCase()}`,
+      icon: genreIcons[genre.key as keyof typeof genreIcons] || 'book-outline'
+    }));
+
+    this.genres.set(genresWithIcons);
   }
 
   async loadGenre(genreKey: string) {

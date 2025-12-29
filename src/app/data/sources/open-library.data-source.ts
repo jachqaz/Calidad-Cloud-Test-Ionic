@@ -1,23 +1,43 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {OpenLibraryResponse} from './open-library.interface';
+import {Observable} from 'rxjs';
+
+export interface OpenLibrarySubjectResponse {
+  key: string;
+  name: string;
+  subject_type: string;
+  work_count: number;
+  works: any[];
+}
+
+export interface OpenLibrarySearchResponse {
+  numFound: number;
+  start: number;
+  docs: any[];
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class OpenLibraryDataSource {
-  private readonly BASE_URL = 'https://openlibrary.org/search.json';
+  private readonly baseUrl = 'https://openlibrary.org';
 
   constructor(private http: HttpClient) {
   }
 
-  searchBooks(query: string): Promise<OpenLibraryResponse> {
-    const params = {q: query, limit: '20'};
-    return this.http.get<OpenLibraryResponse>(this.BASE_URL, {params}).toPromise() as Promise<OpenLibraryResponse>;
+  getBooksBySubject(subject: string, limit: number = 20, offset: number = 0): Observable<OpenLibrarySubjectResponse> {
+    return this.http.get<OpenLibrarySubjectResponse>(
+      `${this.baseUrl}/subjects/${subject}.json?limit=${limit}&offset=${offset}`
+    );
   }
 
-  searchBySubject(subject: string): Promise<OpenLibraryResponse> {
-    const params = {subject: subject, limit: '20'};
-    return this.http.get<OpenLibraryResponse>(this.BASE_URL, {params}).toPromise() as Promise<OpenLibraryResponse>;
+  searchBooks(query: string, limit: number = 20, offset: number = 0): Observable<OpenLibrarySearchResponse> {
+    return this.http.get<OpenLibrarySearchResponse>(
+      `${this.baseUrl}/search.json?q=${encodeURIComponent(query)}&limit=${limit}&offset=${offset}`
+    );
+  }
+
+  getBookDetails(key: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}${key}.json`);
   }
 }

@@ -1,17 +1,49 @@
 import {Routes} from '@angular/router';
+import {GenreGuard} from './presentation/services/genre.guard';
 
 export const routes: Routes = [
   {
+    path: '',
+    redirectTo: '/home',
+    pathMatch: 'full',
+  },
+  {
+    path: 'genre-selection',
+    loadComponent: () => import('./presentation/pages/genre-selection.page').then(m => m.GenreSelectionPage)
+  },
+  {
     path: 'home',
-    loadComponent: () => import('./presentation/pages/home.page').then(m => m.HomePage)
+    loadComponent: () => import('./presentation/pages/home.page').then(m => m.HomePage),
+    canActivate: [GenreGuard]
+  },
+  {
+    path: 'books-by-genre/:genre',
+    loadComponent: () => import('./presentation/pages/books-by-genre.page').then(m => m.BooksByGenrePage),
+    canActivate: [GenreGuard]
   },
   {
     path: 'book-detail/:id',
-    loadComponent: () => import('./presentation/pages/book-detail.page').then(m => m.BookDetailPage)
+    loadComponent: () => import('./presentation/pages/book-detail.page').then(m => m.BookDetailPage),
+    canActivate: [GenreGuard]
   },
   {
-    path: '',
-    redirectTo: 'home',
-    pathMatch: 'full'
+    path: 'search',
+    loadComponent: () => import('./presentation/pages/search.page').then(m => m.SearchPage),
+    canActivate: [GenreGuard]
+  },
+  {
+    path: 'my-books',
+    loadComponent: () => import('./presentation/pages/my-books.page').then(m => m.MyBooksPage),
+    canActivate: [GenreGuard]
+  },
+  {
+    path: 'list-detail/:id',
+    loadComponent: () => import('./presentation/pages/list-detail.page').then(m => m.ListDetailPage),
+    canActivate: [GenreGuard]
+  },
+  {
+    path: 'settings',
+    loadComponent: () => import('./presentation/pages/settings.page').then(m => m.SettingsPage),
+    canActivate: [GenreGuard]
   }
 ];

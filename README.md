@@ -87,7 +87,10 @@ This application implements **Clean Architecture** with strict separation of con
 - ✅ **Smart Search**: Search by title, author, genre, or ISBN
 - ✅ **Custom Lists**: Create and manage up to 3 reading lists
 - ✅ **Book Details**: Rich metadata with covers, ratings, and descriptions
-- ✅ **Responsive Design**: Optimized for mobile, tablet, and desktop
+- ✅ **Genre Selection**: Onboarding with 4 favorite genres
+- ✅ **Hamburger Menu**: Navigation between Home, Search, Lists, Settings
+- ✅ **Duplicate Prevention**: Business rules enforcement in repositories
+- ✅ **Validation**: Maximum 3 lists with comprehensive error handling
 
 ### Technical Features
 
@@ -208,9 +211,9 @@ start coverage/index.html # Windows
 
 **Current Coverage:**
 
-- **59 Unit Tests** across all layers
+- **65+ Unit Tests** across all layers
 - **Domain Layer**: 100% - Entity validation and use case logic
-- **Data Layer**: 100% - Repository implementations with API fallback
+- **Data Layer**: 100% - Repository implementations with offline-first validation
 - **Presentation Layer**: 100% - Component interactions and Signal updates
 
 ### Test Architecture

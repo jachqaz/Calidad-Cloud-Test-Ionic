@@ -1,20 +1,50 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Mis Géneros</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="openSettings()">
+        <ion-icon name="settings-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <div class="ion-padding">
+    <h2>Explora tus géneros favoritos</h2>
 
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+    <ion-grid>
+      <ion-row>
+        @for (genre of selectedGenres(); track genre.id) {
+          <ion-col size="12" size-md="6">
+            <ion-card (click)="openGenre(genre)" button>
+              <ion-card-header>
+                <ion-card-title>
+                  <ion-icon name="library-outline"></ion-icon>
+                  {{ genre.name }}
+                </ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                Descubre libros de {{ genre.name.toLowerCase() }}
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        }
+      </ion-row>
+    </ion-grid>
+
+    @if (selectedGenres().length === 0) {
+      <div class="empty-state">
+        <ion-icon name="library-outline" size="large"></ion-icon>
+        <h3>No hay géneros seleccionados</h3>
+        <p>Ve a configuración para elegir tus géneros favoritos</p>
+        <ion-button (click)="openSettings()" fill="outline">
+          Configurar Géneros
+        </ion-button>
+      </div>
+    }
   </div>
 </ion-content>
