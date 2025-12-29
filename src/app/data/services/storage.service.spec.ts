@@ -102,7 +102,7 @@ describe('StorageService', () => {
       const books = await service.searchBooks('Test');
       expect(books).toHaveSize(1);
       expect(sqliteSpy.executeQuery).toHaveBeenCalledWith(
-        'SELECT * FROM cached_books WHERE title LIKE ? OR authors LIKE ? ORDER BY title',
+        'SELECT * FROM cached_books WHERE title LIKE ? OR author LIKE ? ORDER BY title',
         ['%Test%', '%Test%']
       );
     });
@@ -132,17 +132,17 @@ describe('StorageService', () => {
 
   describe('Custom Lists Management', () => {
     it('should prevent duplicate books in same list', async () => {
-      // Mock existing book in list
-      sqliteSpy.executeQuery.and.returnValue(Promise.resolve({
-        values: [{id: 'existing-entry'}]
-      }));
+      // Setup localStorage with existing book in list
+      const existingListBooks = [{id: '1', listId: 'list-1', bookId: 'book-1', addedAt: new Date().toISOString()}];
+
+      spyOn(Storage.prototype, 'getItem').and.returnValue(JSON.stringify(existingListBooks));
+      spyOn(Storage.prototype, 'setItem');
 
       try {
         await service.addBookToList('list-1', 'book-1');
         fail('Should have thrown error for duplicate');
-      } catch (error) {
-        expect(error).toEqual(jasmine.any(Error));
-        expect((error as Error).message).toBe('El libro ya está en esta lista');
+      } catch (error: any) {
+        expect(error.message).toBe('El libro ya está en esta lista');
       }
     });
 
@@ -164,23 +164,19 @@ describe('StorageService', () => {
     });
 
     it('should get books in list', async () => {
-      sqliteSpy.executeQuery.and.returnValue(Promise.resolve({
-        values: [{
-          id: 'test-book-1',
-          title: 'Test Book',
-          author: 'Test Author',
-          genre: 'fiction',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }]
-      }));
+      // Setup localStorage data
+      const listBooks = [{id: '1', listId: 'list-1', bookId: 'book-1', addedAt: new Date().toISOString()}];
+      const cachedBooks = [{id: 'book-1', title: 'Test Book', author: 'Test Author'}];
 
-      const books = await service.getBooksInList('list-1');
-      expect(books).toHaveSize(1);
-      expect(sqliteSpy.executeQuery).toHaveBeenCalledWith(
-        jasmine.stringContaining('SELECT cb.* FROM cached_books cb'),
-        ['list-1']
-      );
+      spyOn(Storage.prototype, 'getItem').and.callFake((key: string) => {
+        if (key === 'list_books') return JSON.stringify(listBooks);
+        if (key === 'cached_books') return JSON.stringify(cachedBooks);
+        return null;
+      });
+
+      const result = await service.getBooksInList('list-1');
+      expect(result).toHaveSize(1);
+      expect(result[0].id).toBe('book-1');
     });
   });
 });
