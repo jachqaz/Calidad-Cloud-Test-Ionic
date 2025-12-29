@@ -1,7 +1,7 @@
 import {BookEntity} from '../models';
 
 export interface BookRepository {
-  search(query: string): Promise<BookEntity[]>;
+  search(query: string, page?: number): Promise<BookEntity[]>;
 
   getByGenre(genre: string): Promise<BookEntity[]>;
 

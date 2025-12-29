@@ -31,7 +31,8 @@ export class OpenLibraryDataSource {
     );
   }
 
-  searchBooks(query: string, limit: number = 20, offset: number = 0): Observable<OpenLibrarySearchResponse> {
+  searchBooks(query: string, page: number = 1, limit: number = 20): Observable<OpenLibrarySearchResponse> {
+    const offset = (page - 1) * limit;
     return this.http.get<OpenLibrarySearchResponse>(
       `${this.baseUrl}/search.json?q=${encodeURIComponent(query)}&limit=${limit}&offset=${offset}`
     );

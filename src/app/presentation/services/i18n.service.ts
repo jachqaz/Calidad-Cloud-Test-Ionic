@@ -75,6 +75,11 @@ const translations = {
     'list.empty': 'Lista vacía',
     'list.add-books': 'Agrega algunos libros a esta lista',
     'list.max-reached': 'Máximo 3 listas permitidas',
+    'list.created-count': 'listas creadas',
+
+    // Loading states
+    'loading.more-books': 'Cargando más libros...',
+    'loading.searching': 'Buscando libros...',
 
     // Settings
     'settings.title': 'Configuración',
@@ -89,7 +94,9 @@ const translations = {
     'common.close': 'Cerrar',
     'common.save': 'Guardar',
     'common.delete': 'Eliminar',
-    'common.edit': 'Editar'
+    'common.edit': 'Editar',
+    'common.book': 'libro',
+    'common.books': 'libros'
   },
   en: {
     // Navigation
@@ -134,6 +141,11 @@ const translations = {
     'list.empty': 'Empty list',
     'list.add-books': 'Add some books to this list',
     'list.max-reached': 'Maximum 3 lists allowed',
+    'list.created-count': 'lists created',
+
+    // Loading states
+    'loading.more-books': 'Loading more books...',
+    'loading.searching': 'Searching books...',
 
     // Settings
     'settings.title': 'Settings',
@@ -148,6 +160,8 @@ const translations = {
     'common.close': 'Close',
     'common.save': 'Save',
     'common.delete': 'Delete',
-    'common.edit': 'Edit'
+    'common.edit': 'Edit',
+    'common.book': 'book',
+    'common.books': 'books'
   }
 };

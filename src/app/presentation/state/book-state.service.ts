@@ -22,6 +22,10 @@ export class BookStateService {
   readonly selectedBook = this._selectedBook.asReadonly();
   private getBooksByGenreUseCase: GetBooksByGenreUseCase;
 
+  // Pagination state
+  private currentQuery = '';
+  private currentPage = 1;
+
   constructor(@Inject(BOOK_REPOSITORY_TOKEN) private bookRepository: BookRepository) {
     this.getBooksByGenreUseCase = new GetBooksByGenreUseCase(this.bookRepository);
   }
@@ -29,9 +33,11 @@ export class BookStateService {
   async searchBooks(query: string): Promise<void> {
     this.setLoading(true);
     this.clearError();
+    this.currentQuery = query;
+    this.currentPage = 1;
 
     try {
-      const books = await this.bookRepository.search(query);
+      const books = await this.bookRepository.search(query, 1);
       this._books.set(books);
     } catch (error) {
       this.setError('Failed to search books');
@@ -91,12 +97,33 @@ export class BookStateService {
   }
 
   async loadMoreBooks(): Promise<void> {
-    // Implementation for pagination - for now just a placeholder
-    // In a real app, this would load the next page of results
+    if (!this.currentQuery || this._isLoading()) {
+      return;
+    }
+
+    this.setLoading(true);
+    this.clearError();
+
+    try {
+      this.currentPage++;
+      const newBooks = await this.bookRepository.search(this.currentQuery, this.currentPage);
+
+      if (newBooks.length > 0) {
+        const currentBooks = this._books();
+        this._books.set([...currentBooks, ...newBooks]);
+      }
+    } catch (error) {
+      this.setError('Failed to load more books');
+      this.currentPage--; // Revert page increment on error
+    } finally {
+      this.setLoading(false);
+    }
   }
 
   clearBooks(): void {
     this._books.set([]);
+    this.currentQuery = '';
+    this.currentPage = 1;
   }
 
   private setLoading(loading: boolean): void {

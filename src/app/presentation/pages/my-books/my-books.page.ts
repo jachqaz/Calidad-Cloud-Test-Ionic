@@ -6,6 +6,7 @@ import {CustomListEntity, MAX_CUSTOM_LISTS} from '../../../domain/models';
 import {LibraryFacadeService} from '../../services/library-facade.service';
 import {StorageService} from '../../../data/services/storage.service';
 import {ToastService} from '../../services/shared/toast.service';
+import {I18nService} from '../../services/i18n.service';
 
 @Component({
   selector: 'app-my-books',
@@ -26,7 +27,8 @@ export class MyBooksPage implements OnInit {
     private actionSheetController: ActionSheetController,
     private modalController: ModalController,
     private storage: StorageService,
-    private toastService: ToastService
+    private toastService: ToastService,
+    public i18n: I18nService
   ) {
   }
 

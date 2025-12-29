@@ -84,7 +84,7 @@
         [disabled]="!canLoadMore()">
         <ion-infinite-scroll-content
           loadingSpinner="bubbles"
-          loadingText="Loading more books...">
+          [loadingText]="i18n.t('loading.more-books')">
         </ion-infinite-scroll-content>
       </ion-infinite-scroll>
     </div>

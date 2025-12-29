@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>My Lists</ion-title>
+    <ion-title>{{ i18n.t('list.my-lists') }}</ion-title>
     <ion-buttons slot="end">
       @if (customLists().length < MAX_CUSTOM_LISTS) {
         <ion-button (click)="createList()">
@@ -19,17 +19,17 @@
     @if (isLoading()) {
       <div class="loading-state">
         <ion-spinner></ion-spinner>
-        <p>Loading lists...</p>
+        <p>{{ i18n.t('common.loading') }}</p>
       </div>
     }
 
     @if (!isLoading() && customLists().length === 0) {
       <div class="empty-state">
         <ion-icon name="library-outline" size="large"></ion-icon>
-        <h2>No lists yet</h2>
-        <p>Create your first custom list to organize your favorite books</p>
+        <h2>{{ i18n.t('list.empty') }}</h2>
+        <p>{{ i18n.t('list.add-books') }}</p>
         <ion-button (click)="createList()" fill="outline">
-          Create List
+          {{ i18n.t('list.create') }}
         </ion-button>
       </div>
     }
@@ -41,7 +41,7 @@
             <ion-icon color="primary" name="library-outline" slot="start"></ion-icon>
             <ion-label>
               <h2>{{ list.name }}</h2>
-              <p>{{ list.bookCount }} {{ list.bookCount === 1 ? 'book' : 'books' }}</p>
+              <p>{{ list.bookCount }} {{ list.bookCount === 1 ? i18n.t('common.book') : i18n.t('common.books') }}</p>
               @if (list.description) {
                 <p>{{ list.description }}</p>
               }
@@ -58,7 +58,7 @@
 
       <div class="list-info">
         <ion-note>
-          {{ customLists().length }}/{{ MAX_CUSTOM_LISTS }} lists created
+          {{ customLists().length }}/{{ MAX_CUSTOM_LISTS }} {{ i18n.t('list.created-count') }}
         </ion-note>
       </div>
     }

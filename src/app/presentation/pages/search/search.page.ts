@@ -28,6 +28,7 @@ export class SearchPage {
 
   async onSearchInput(event: any) {
     const query = event.target.value.trim();
+    this.searchQuery = query;
     if (query.length < 2) {
       this.libraryFacade.clearBooks();
       return;
@@ -42,10 +43,8 @@ export class SearchPage {
   }
 
   async loadMore(event: any) {
-    if (this.searchQuery.length >= 2) {
-      await this.libraryFacade.loadMoreBooks();
-    }
-    event.target.complete();
+    await this.libraryFacade.loadMoreBooks();
+    await event.target.complete();
   }
 
   canLoadMore(): boolean {

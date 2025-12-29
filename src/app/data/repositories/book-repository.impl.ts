@@ -17,10 +17,10 @@ export class BookRepositoryImpl implements BookRepository {
   ) {
   }
 
-  async search(query: string): Promise<BookEntity[]> {
+  async search(query: string, page: number = 1): Promise<BookEntity[]> {
     if (this.connectivity.connected()) {
       try {
-        const response = await this.openLibrary.searchBooks(query).toPromise();
+        const response = await this.openLibrary.searchBooks(query, page).toPromise();
         if (response?.docs) {
           const books = response.docs.map(doc => BookMapper.fromOpenLibrarySearchDoc(doc));
           for (const book of books) {

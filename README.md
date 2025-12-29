@@ -1,6 +1,101 @@
 # Calidad Cloud Test Ionic - Open Library Books App
 
-A modern Book Library application built with Ionic 7+ and Angular 17+ following Clean Architecture principles. Integrates with OpenLibrary API for book discovery with offline-first SQLite storage.
+A modern Book Library application built with Ionic 7+ and Angular 17+ following Clean Architecture principles. Integrates with OpenLibrary API for book discovery with offline-first SQLite storage and complete internationalization support.
+
+## 🌍 Internationalization (i18n)
+
+### Complete Bilingual Support
+
+The application features **complete internationalization** eliminating "Espanglish" and providing professional support for **Spanish** and **English**.
+
+#### ✅ i18n Features Implemented
+
+- **I18nService**: Centralized language management using Angular Signals
+- **Persistence**: Language preference saved in localStorage
+- **Default Language**: Spanish (es)
+- **Supported Languages**: Spanish (es) and English (en)
+- **Reactive Navigation**: Menu updates automatically with language changes
+- **Instant Switching**: No page reloads required
+
+#### 🎯 Translated Components
+
+- **Home Page**: Titles, welcome messages, and navigation
+- **Genre Selection**: Instructions and buttons
+- **Search**: Placeholders, status messages, and errors
+- **Settings**: Language selector and options
+- **Navigation**: Hamburger menu with translated elements
+- **All Major Pages**: Complete i18n service integration
+
+#### 🛠️ Technical Implementation
+
+```typescript
+// I18nService with Angular Signals
+export class I18nService {
+  private currentLanguage = signal<Language>('es');
+  
+  setLanguage(lang: Language): void
+  t(key: string): string // Translation function
+}
+
+// Usage in components
+constructor(public i18n: I18nService) {}
+
+// In HTML templates
+{{ i18n.t('home.title') }}
+{{ i18n.t('nav.search') }}
+```
+
+#### 📚 Translation Dictionary
+
+**Navigation**
+
+- `nav.home` → "Inicio" / "Home"
+- `nav.search` → "Buscar" / "Search"
+- `nav.my-books` → "Mis Libros" / "My Books"
+- `nav.settings` → "Configuración" / "Settings"
+
+**Home Page**
+
+- `home.title` → "Gestor de Biblioteca Abierta" / "Open Library Manager"
+- `home.welcome` → "Bienvenido a tu Biblioteca" / "Welcome to your Library"
+- `home.explore` → "Explora tus géneros favoritos" / "Explore your favorite genres"
+
+**Search**
+
+- `search.title` → "Buscar Libros" / "Search Books"
+- `search.placeholder` → "Buscar por título, autor o ISBN..." / "Search by title, author or ISBN..."
+- `search.no-results` → "No se encontraron resultados" / "No results found"
+
+**Settings**
+
+- `settings.language` → "Idioma" / "Language"
+- `settings.genres` → "Géneros Favoritos" / "Favorite Genres"
+
+**Common**
+
+- `common.loading` → "Cargando..." / "Loading..."
+- `common.error` → "Error" / "Error"
+- `common.retry` → "Reintentar" / "Retry"
+
+#### 🔄 Reactive Language Switching
+
+```typescript
+// Reactive navigation using Signals
+public appPages = computed(() => [
+  {title: this.i18n.t('nav.home'), url: '/home'},
+  {title: this.i18n.t('nav.search'), url: '/search'},
+  // Only affected components re-render when language changes
+]);
+```
+
+#### 📱 User Experience
+
+1. **Access**: Settings → Language
+2. **Selector**: Dropdown with "Español" and "English"
+3. **Instant Application**: Immediate change throughout the app
+4. **Persistence**: Maintained between sessions
+
+---
 
 ## 🏗️ Architecture
 
@@ -82,6 +177,7 @@ This application implements **Clean Architecture** with strict separation of con
 
 ### Core Functionality
 
+- ✅ **Internationalization**: Complete Spanish/English support with instant switching
 - ✅ **Book Discovery**: Search OpenLibrary's 20M+ book database
 - ✅ **Offline Reading**: Full functionality without internet connection
 - ✅ **Smart Search**: Search by title, author, genre, or ISBN
@@ -94,6 +190,7 @@ This application implements **Clean Architecture** with strict separation of con
 
 ### Technical Features
 
+- 🌍 **Internationalization**: Angular Signals-based i18n with Spanish/English support
 - 📱 **Reactive State**: Angular Signals for efficient UI updates
 - 🎯 **Clean Architecture**: Strict layer separation with dependency inversion
 - 💾 **Offline-First**: SQLite database with OpenLibrary API fallback
@@ -107,6 +204,7 @@ This application implements **Clean Architecture** with strict separation of con
 - **Architecture**: Clean Architecture + SOLID Principles
 - **Components**: Standalone Components (Angular 17+)
 - **State Management**: Angular Signals
+- **Internationalization**: Angular i18n with Signals-based reactivity
 - **Styling**: SCSS + Ionic CSS Variables
 - **Language**: TypeScript (strict mode)
 - **Mobile**: Capacitor 8 for hybrid builds
@@ -211,10 +309,11 @@ start coverage/index.html # Windows
 
 **Current Coverage:**
 
-- **65+ Unit Tests** across all layers
+- **70+ Unit Tests** across all layers including i18n
 - **Domain Layer**: 100% - Entity validation and use case logic
 - **Data Layer**: 100% - Repository implementations with offline-first validation
-- **Presentation Layer**: 100% - Component interactions and Signal updates
+- **Presentation Layer**: 100% - Component interactions, Signal updates, and i18n service
+- **Internationalization**: 100% - Complete i18n service testing with language switching
 
 ### Test Architecture
 
@@ -228,6 +327,8 @@ tests/
 │   └── mappers/*.spec.ts         # Data transformation
 └── presentation/
     ├── components/*.spec.ts      # UI component tests
+    ├── services/
+    │   └── i18n.service.spec.ts  # Internationalization tests
     └── state/*.spec.ts           # Signal state management
 ```
 
@@ -364,6 +465,7 @@ src/app/
     │   ├── home.page.ts        # Main book browser
     │   └── book-detail.page.ts # Book details view
     ├── services/              # Presentation services
+    │   ├── i18n.service.ts     # Internationalization service
     │   ├── library-facade.service.ts # UI facade
     │   └── use-case.service.ts      # Use case orchestration
     └── state/                 # State management
@@ -440,8 +542,9 @@ All project documentation is centralized here:
 
 ### 📝 Core Documentation
 
+- **[Internationalization](#-internationalization-i18n)** - Complete bilingual support implementation
 - **[Architecture Guide](#-architecture)** - Clean Architecture implementation
-- **[Setup Instructions](#-setup--installation)** - Getting started
+- **[Setup Instructions](#-quick-start)** - Getting started
 - **[Testing Guide](#-testing--quality-assurance)** - Running tests and coverage
 - **[Technical Decisions](#-technical-decisions--architecture-rationale)** - Why we chose our stack
 
@@ -498,4 +601,4 @@ MIT License - see LICENSE file for details.
 
 ---
 
-**Built with ❤️ using Clean Architecture, Angular Signals, and OpenLibrary API**
+**Built with ❤️ using Clean Architecture, Angular Signals, Internationalization, and OpenLibrary API**

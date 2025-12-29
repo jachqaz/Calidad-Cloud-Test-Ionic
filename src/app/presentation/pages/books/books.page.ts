@@ -5,6 +5,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {LibraryFacadeService} from '../../services/library-facade.service';
 import {BookEntity} from '../../../domain/models';
 import {StorageService} from '../../../data/services/storage.service';
+import {I18nService} from '../../services/i18n.service';
 
 @Component({
   selector: 'app-books',
@@ -23,7 +24,8 @@ export class BooksPage implements OnInit {
     protected libraryFacade: LibraryFacadeService,
     private router: Router,
     private route: ActivatedRoute,
-    private storage: StorageService
+    private storage: StorageService,
+    public i18n: I18nService
   ) {
   }
 
@@ -82,9 +84,8 @@ export class BooksPage implements OnInit {
   }
 
   async loadMore(event: any) {
-    setTimeout(() => {
-      event.target.complete();
-    }, 1000);
+    await this.libraryFacade.loadMoreBooks();
+    event.target.complete();
   }
 
   canLoadMore(): boolean {
