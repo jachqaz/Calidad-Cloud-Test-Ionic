@@ -29,7 +29,9 @@ jobs:
           cache: 'npm'
 
       - name: 📦 Install Dependencies
-        run: npm ci
+        run: |
+          rm -f package-lock.json
+          npm install
 
       - name: 🔍 Run Linting
         run: npm run lint
@@ -61,7 +63,9 @@ jobs:
           cache: 'npm'
 
       - name: 📦 Install Dependencies
-        run: npm ci
+        run: |
+          rm -f package-lock.json
+          npm install
 
       - name: ⚙️ Build Web
         run: npm run build -- --configuration=production
@@ -107,7 +111,9 @@ jobs:
             gradle-${{ runner.os }}-
 
       - name: 📦 Install Dependencies
-        run: npm ci
+        run: |
+          rm -f package-lock.json
+          npm install
 
       - name: 📥 Download Web Artifact
         uses: actions/download-artifact@v4
@@ -157,7 +163,9 @@ jobs:
           cache: 'npm'
 
       - name: 📦 Install Dependencies
-        run: npm ci
+        run: |
+          rm -f package-lock.json
+          npm install
 
       - name: 📥 Download Web Artifact
         uses: actions/download-artifact@v4
