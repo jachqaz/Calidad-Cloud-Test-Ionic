@@ -149,7 +149,6 @@ export class StorageService {
     // Always save to localStorage
     const updatedLists = [...existingLists, newList];
     localStorage.setItem('custom_lists', JSON.stringify(updatedLists));
-    console.log('Saved to localStorage:', updatedLists);
 
     // Also try SQLite for native platforms
     if (Capacitor.isNativePlatform()) {

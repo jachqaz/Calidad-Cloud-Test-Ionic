@@ -23,10 +23,8 @@ export class SqliteService {
     if (this.isInitialized()) return;
 
     try {
-      console.log('Initializing SQLite database...');
 
       if (this.isWebPlatform) {
-        console.log('Using localStorage fallback for web platform');
         this.isInitialized.set(true);
         return;
       }
@@ -40,18 +38,14 @@ export class SqliteService {
       );
 
       await this.db.open();
-      console.log('Database connection opened');
 
       await this.createTables();
-      console.log('Tables created successfully');
 
       this.isInitialized.set(true);
-      console.log('Database initialization completed');
     } catch (error) {
       // If connection already exists, just mark as initialized
       if ((error as any)?.message?.includes('already exists')) {
         this.isInitialized.set(true);
-        console.log('Database already initialized');
         return;
       }
       console.error('Database initialization failed:', error);
