@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 import {IonicModule} from '@ionic/angular';
 
 @Component({
@@ -9,6 +9,7 @@ import {IonicModule} from '@ionic/angular';
     </ion-app>
   `,
   imports: [IonicModule],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppComponent {
   constructor() {}

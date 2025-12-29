@@ -37,7 +37,7 @@
                   <ion-card-title>{{ genre.name }}</ion-card-title>
                 </ion-card-header>
                 <ion-card-content>
-                  <ion-icon name="library-outline" size="large"></ion-icon>
+                  <ion-icon [name]="genre.icon || 'library-outline'" size="large"></ion-icon>
                   <p>Explore {{ genre.name.toLowerCase() }} books</p>
                 </ion-card-content>
               </ion-card>

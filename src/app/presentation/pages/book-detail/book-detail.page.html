@@ -65,12 +65,14 @@
           }
         </div>
       </div>
-
-      <ion-fab horizontal="end" slot="fixed" vertical="bottom">
-        <ion-fab-button (click)="openAddToListModal()">
-          <ion-icon name="bookmark-outline"></ion-icon>
-        </ion-fab-button>
-      </ion-fab>
     }
   </div>
+
+  @if (selectedBook()) {
+    <ion-fab horizontal="end" slot="fixed" vertical="bottom">
+      <ion-fab-button (click)="openAddToListModal()">
+        <ion-icon name="bookmark-outline"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+  }
 </ion-content>

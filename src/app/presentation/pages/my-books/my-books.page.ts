@@ -1,10 +1,11 @@
 import {Component, OnInit, signal} from '@angular/core';
-import {ActionSheetController, AlertController, IonicModule} from '@ionic/angular';
+import {ActionSheetController, AlertController, IonicModule, ModalController} from '@ionic/angular';
 import {CommonModule} from '@angular/common';
 import {Router} from '@angular/router';
 import {CustomListEntity, MAX_CUSTOM_LISTS} from '../../../domain/models';
 import {LibraryFacadeService} from '../../services/library-facade.service';
 import {StorageService} from '../../../data/services/storage.service';
+import {ToastService} from '../../services/shared/toast.service';
 
 @Component({
   selector: 'app-my-books',
@@ -23,7 +24,9 @@ export class MyBooksPage implements OnInit {
     protected libraryFacade: LibraryFacadeService,
     private alertController: AlertController,
     private actionSheetController: ActionSheetController,
-    private storage: StorageService
+    private modalController: ModalController,
+    private storage: StorageService,
+    private toastService: ToastService
   ) {
   }
 
@@ -48,43 +51,30 @@ export class MyBooksPage implements OnInit {
   }
 
   async createList() {
-    const alert = await this.alertController.create({
-      header: 'Nueva Lista',
-      inputs: [
-        {
-          name: 'name',
-          type: 'text',
-          placeholder: 'Nombre de la lista',
-          attributes: {
-            maxlength: 50
-          }
-        },
-        {
-          name: 'description',
-          type: 'textarea',
-          placeholder: 'Descripción (opcional)',
-          attributes: {
-            maxlength: 200
-          }
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Crear',
-          handler: async (data) => {
-            if (data.name?.trim()) {
-              await this.handleCreateList(data.name.trim(), data.description?.trim());
-            }
-          }
-        }
-      ]
+    const {CreateListModalComponent} = await import('../../components/create-list-modal/create-list-modal.component');
+    const modal = await this.modalController.create({
+      component: CreateListModalComponent
     });
 
-    await alert.present();
+    await modal.present();
+    const {data} = await modal.onWillDismiss();
+
+    if (data?.created) {
+      await this.loadLists();
+      const toast = document.createElement('ion-toast');
+      toast.message = `Lista "${data.name}" creada exitosamente`;
+      toast.duration = 2000;
+      toast.color = 'success';
+      document.body.appendChild(toast);
+      toast.present();
+    } else if (data?.error) {
+      const toast = document.createElement('ion-toast');
+      toast.message = data.error;
+      toast.duration = 3000;
+      toast.color = 'danger';
+      document.body.appendChild(toast);
+      toast.present();
+    }
   }
 
   async handleCreateList(name: string, description?: string) {
@@ -98,12 +88,12 @@ export class MyBooksPage implements OnInit {
       toast.color = 'success';
       document.body.appendChild(toast);
       toast.present();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating list:', error);
 
       const toast = document.createElement('ion-toast');
-      toast.message = 'Error al crear la lista';
-      toast.duration = 2000;
+      toast.message = error.message || 'Error al crear la lista';
+      toast.duration = 3000;
       toast.color = 'danger';
       document.body.appendChild(toast);
       toast.present();
@@ -144,45 +134,33 @@ export class MyBooksPage implements OnInit {
   }
 
   async editList(list: CustomListEntity) {
-    const alert = await this.alertController.create({
-      header: 'Editar Lista',
-      inputs: [
-        {
-          name: 'name',
-          type: 'text',
-          value: list.name,
-          placeholder: 'Nombre de la lista',
-          attributes: {
-            maxlength: 50
-          }
-        },
-        {
-          name: 'description',
-          type: 'textarea',
-          value: list.description || '',
-          placeholder: 'Descripción (opcional)',
-          attributes: {
-            maxlength: 200
-          }
-        }
-      ],
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Guardar',
-          handler: async (data) => {
-            if (data.name?.trim()) {
-              await this.handleEditList(list.id, data.name.trim(), data.description?.trim());
-            }
-          }
-        }
-      ]
+    const {CreateListModalComponent} = await import('../../components/create-list-modal/create-list-modal.component');
+    const modal = await this.modalController.create({
+      component: CreateListModalComponent,
+      componentProps: {
+        list: list
+      }
     });
 
-    await alert.present();
+    await modal.present();
+    const {data} = await modal.onWillDismiss();
+
+    if (data?.updated) {
+      await this.loadLists();
+      const toast = document.createElement('ion-toast');
+      toast.message = 'Lista actualizada exitosamente';
+      toast.duration = 2000;
+      toast.color = 'success';
+      document.body.appendChild(toast);
+      toast.present();
+    } else if (data?.error) {
+      const toast = document.createElement('ion-toast');
+      toast.message = data.error;
+      toast.duration = 3000;
+      toast.color = 'danger';
+      document.body.appendChild(toast);
+      toast.present();
+    }
   }
 
   async handleEditList(listId: string, name: string, description?: string) {
@@ -196,12 +174,12 @@ export class MyBooksPage implements OnInit {
       toast.color = 'success';
       document.body.appendChild(toast);
       toast.present();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating list:', error);
 
       const toast = document.createElement('ion-toast');
-      toast.message = 'Error al actualizar la lista';
-      toast.duration = 2000;
+      toast.message = error.message || 'Error al actualizar la lista';
+      toast.duration = 3000;
       toast.color = 'danger';
       document.body.appendChild(toast);
       toast.present();
@@ -234,22 +212,14 @@ export class MyBooksPage implements OnInit {
     try {
       await this.storage.deleteCustomList(list.id);
       await this.loadLists();
-
-      const toast = document.createElement('ion-toast');
-      toast.message = `Lista "${list.name}" eliminada`;
-      toast.duration = 2000;
-      toast.color = 'success';
-      document.body.appendChild(toast);
-      toast.present();
+      this.toastService.showSuccess(`Lista "${list.name}" eliminada`);
     } catch (error) {
       console.error('Error deleting list:', error);
-
-      const toast = document.createElement('ion-toast');
-      toast.message = 'Error al eliminar la lista';
-      toast.duration = 2000;
-      toast.color = 'danger';
-      document.body.appendChild(toast);
-      toast.present();
+      this.toastService.showError('Error al eliminar la lista');
     }
   }
+
+  // Eliminar método duplicado
+  // async handleCreateList() - ya no es necesario
+  // async handleEditList() - ya no es necesario
 }

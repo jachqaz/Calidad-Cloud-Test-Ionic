@@ -12,10 +12,16 @@
           (click)="toggleGenre(genre)"
           [class.selected]="isSelected(genre.id)">
           <ion-card-content>
+            <ion-icon
+              [color]="isSelected(genre.id) ? 'primary' : 'medium'"
+              [name]="genre.icon || 'library-outline'"
+              size="large">
+            </ion-icon>
             <h3>{{ genre.name }}</h3>
             <ion-icon
               [color]="isSelected(genre.id) ? 'primary' : 'medium'"
-              [name]="isSelected(genre.id) ? 'checkmark-circle' : 'ellipse-outline'">
+              [name]="isSelected(genre.id) ? 'checkmark-circle' : 'ellipse-outline'"
+              class="selection-icon">
             </ion-icon>
           </ion-card-content>
         </ion-card>

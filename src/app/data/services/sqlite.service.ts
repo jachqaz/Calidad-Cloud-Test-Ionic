@@ -9,6 +9,7 @@ export class SqliteService {
   private sqlite: SQLiteConnection = new SQLiteConnection(CapacitorSQLite);
   private db: SQLiteDBConnection | null = null;
   private isInitialized = signal(false);
+  private isWebPlatform = Capacitor.getPlatform() === 'web';
 
   async initializeDatabase(): Promise<void> {
     if (this.isInitialized()) return;
@@ -16,9 +17,11 @@ export class SqliteService {
     try {
       console.log('Initializing SQLite database...');
 
-      if (Capacitor.isNativePlatform()) {
-        // await this.sqlite.checkConnectionsConsistency();
-        // await this.sqlite.isConnection('library_db', false);
+      if (this.isWebPlatform) {
+        // For web platform, use localStorage as fallback
+        console.log('Using localStorage fallback for web platform');
+        this.isInitialized.set(true);
+        return;
       }
 
       this.db = await this.sqlite.createConnection(
@@ -44,6 +47,9 @@ export class SqliteService {
   }
 
   async executeQuery(query: string, values?: any[]): Promise<any> {
+    if (this.isWebPlatform) {
+      return {values: []}; // Return empty result for web
+    }
     if (!this.db) {
       await this.initializeDatabase();
     }
@@ -51,6 +57,9 @@ export class SqliteService {
   }
 
   async executeRun(query: string, values?: any[]): Promise<any> {
+    if (this.isWebPlatform) {
+      return {changes: {changes: 0}}; // Return mock result for web
+    }
     if (!this.db) {
       await this.initializeDatabase();
     }

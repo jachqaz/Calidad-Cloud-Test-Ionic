@@ -25,9 +25,17 @@
         flex-direction: column;
         align-items: center;
         gap: 8px;
+        position: relative;
 
         ion-icon {
           font-size: 24px;
+        }
+
+        .selection-icon {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          font-size: 20px;
         }
       }
     }

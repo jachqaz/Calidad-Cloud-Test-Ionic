@@ -1,0 +1,26 @@
+<div class="books-grid">
+  @for (book of books; track book.id) {
+    <ion-card (click)="onBookClick(book)" class="book-card">
+      <img
+        [alt]="book.title"
+        [src]="book.coverUrl || 'assets/book-placeholder.svg'"
+        class="book-cover">
+      <ion-card-content>
+        <h3>{{ book.title }}</h3>
+        <p>{{ book.author }}</p>
+        <ion-badge color="primary">{{ book.genre }}</ion-badge>
+      </ion-card-content>
+    </ion-card>
+  }
+</div>
+
+@if (showInfiniteScroll) {
+  <ion-infinite-scroll
+    (ionInfinite)="onLoadMore($event)"
+    [disabled]="!canLoadMore">
+    <ion-infinite-scroll-content
+      [loadingText]="loadingText"
+      loadingSpinner="bubbles">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+}

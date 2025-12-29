@@ -1,0 +1,48 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ isEditMode ? 'Editar Lista' : 'Nueva Lista' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="form-section">
+    <ion-item>
+      <ion-input
+        [(ngModel)]="listName"
+        maxlength="50"
+        placeholder="Nombre de la lista"
+        required>
+      </ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-textarea
+        [(ngModel)]="listDescription"
+        maxlength="200"
+        placeholder="Descripción (opcional)"
+        rows="3">
+      </ion-textarea>
+    </ion-item>
+
+    <div class="create-button-container">
+      <ion-button
+        (click)="createList()"
+        [disabled]="!listName.trim()"
+        expand="block"
+        fill="solid">
+        {{ isEditMode ? 'Guardar Cambios' : 'Crear Lista' }}
+      </ion-button>
+    </div>
+  </div>
+
+  @if (!isEditMode) {
+    <div class="lists-info">
+      <ion-note>
+        {{ currentListCount() }}/{{ MAX_CUSTOM_LISTS }} listas creadas
+      </ion-note>
+    </div>
+  }
+</ion-content>

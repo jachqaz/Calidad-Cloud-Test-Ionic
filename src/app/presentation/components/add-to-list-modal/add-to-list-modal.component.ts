@@ -42,6 +42,10 @@ export class AddToListModalComponent implements OnInit {
     if (!this.book) return;
 
     try {
+      // First save the book to cached_books
+      await this.storage.saveBook(this.book);
+
+      // Then add to list
       await this.storage.addBookToList(list.id, this.book.id);
 
       // Show success message
@@ -76,6 +80,10 @@ export class AddToListModalComponent implements OnInit {
         bookCount: 0
       });
 
+      // First save the book to cached_books
+      await this.storage.saveBook(this.book);
+
+      // Then add to list
       await this.storage.addBookToList(listId, this.book.id);
 
       // Show success message
