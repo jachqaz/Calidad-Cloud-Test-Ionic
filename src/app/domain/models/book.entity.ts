@@ -8,6 +8,10 @@ export interface BookEntity {
   description?: string;
   coverUrl?: string;
   rating?: number;
+  subjects?: string[];
+  subjectPlaces?: string[];
+  subjectPeople?: string[];
+  subjectTimes?: string[];
   createdAt: Date;
   updatedAt: Date;
 }

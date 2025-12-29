@@ -5,9 +5,15 @@ export interface OpenLibraryWork {
   title: string;
   authors?: { key: string; name: string }[];
   cover_id?: number;
+  covers?: number[];
   cover_edition_key?: string;
   first_publish_year?: number;
   subject?: string[];
+  subjects?: string[];
+  description?: any;
+  subject_places?: string[];
+  subject_people?: string[];
+  subject_times?: string[];
   edition_count?: number;
   ia?: string[];
   availability?: {
@@ -36,13 +42,22 @@ export interface OpenLibrarySearchDoc {
 
 export class BookMapper {
   static fromOpenLibraryWork(work: OpenLibraryWork, genre?: string): BookEntity {
+    const authorName = work.authors?.[0]?.name ||
+      (work.authors?.[0] as any)?.author?.name ||
+      'Unknown Author';
+
     return {
       id: this.extractIdFromKey(work.key),
       title: work.title,
-      author: work.authors?.[0]?.name || 'Unknown Author',
+      author: authorName,
       genre: genre || 'Unknown',
       publishedYear: work.first_publish_year,
-      coverUrl: work.cover_id ? this.buildCoverUrl(work.cover_id) : undefined,
+      coverUrl: work.covers?.[0] ? this.buildCoverUrl(work.covers[0]) : (work.cover_id ? this.buildCoverUrl(work.cover_id) : undefined),
+      description: this.extractDescription(work.description),
+      subjects: work.subjects || work.subject,
+      subjectPlaces: work.subject_places,
+      subjectPeople: work.subject_people,
+      subjectTimes: work.subject_times,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -60,6 +75,13 @@ export class BookMapper {
       createdAt: new Date(),
       updatedAt: new Date()
     };
+  }
+
+  private static extractDescription(description?: any): string | undefined {
+    if (!description) return undefined;
+    if (typeof description === 'string') return description;
+    if (description.value) return description.value;
+    return undefined;
   }
 
   private static extractIdFromKey(key: string): string {

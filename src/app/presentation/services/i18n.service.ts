@@ -60,11 +60,17 @@ const translations = {
     'search.try-different': 'Intenta con términos diferentes',
 
     // Book Detail
+    'book.title': 'Detalle del Libro',
     'book.add-to-list': 'Agregar a Lista',
     'book.author': 'Autor',
     'book.published': 'Publicado',
     'book.pages': 'páginas',
     'book.no-description': 'No hay descripción disponible',
+    'book.description': 'Descripción',
+    'book.subjects': 'Temas',
+    'book.places': 'Lugares',
+    'book.people': 'Personajes',
+    'book.times': 'Época',
 
     // Lists
     'list.my-lists': 'Mis Listas',
@@ -126,11 +132,17 @@ const translations = {
     'search.try-different': 'Try different search terms',
 
     // Book Detail
+    'book.title': 'Book Detail',
     'book.add-to-list': 'Add to List',
     'book.author': 'Author',
     'book.published': 'Published',
     'book.pages': 'pages',
     'book.no-description': 'No description available',
+    'book.description': 'Description',
+    'book.subjects': 'Subjects',
+    'book.places': 'Places',
+    'book.people': 'Characters',
+    'book.times': 'Time Period',
 
     // Lists
     'list.my-lists': 'My Lists',

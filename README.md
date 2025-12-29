@@ -71,6 +71,23 @@ constructor(public i18n: I18nService) {}
 - `settings.language` → "Idioma" / "Language"
 - `settings.genres` → "Géneros Favoritos" / "Favorite Genres"
 
+**Book Detail Page**
+
+- `book.title` → "Detalle del Libro" / "Book Detail"
+- `book.author` → "Autor" / "Author"
+- `book.published` → "Publicado" / "Published"
+- `book.description` → "Descripción" / "Description"
+- `book.subjects` → "Temas" / "Subjects"
+- `book.places` → "Lugares" / "Places"
+- `book.people` → "Personajes" / "Characters"
+- `book.times` → "Épocas" / "Time Periods"
+
+**Pagination**
+
+- `search.loading-more` → "Cargando más libros..." / "Loading more books..."
+- `search.book-count` → "libro" / "book" (singular)
+- `search.books-count` → "libros" / "books" (plural)
+
 **Common**
 
 - `common.loading` → "Cargando..." / "Loading..."
@@ -179,10 +196,12 @@ This application implements **Clean Architecture** with strict separation of con
 
 - ✅ **Internationalization**: Complete Spanish/English support with instant switching
 - ✅ **Book Discovery**: Search OpenLibrary's 20M+ book database
+- ✅ **Rich Book Details**: Complete metadata including descriptions, subjects, places, people, and time periods
 - ✅ **Offline Reading**: Full functionality without internet connection
 - ✅ **Smart Search**: Search by title, author, genre, or ISBN
+- ✅ **Infinite Scroll Pagination**: Load more books seamlessly with proper page-based pagination
 - ✅ **Custom Lists**: Create and manage up to 3 reading lists
-- ✅ **Book Details**: Rich metadata with covers, ratings, and descriptions
+- ✅ **Flexible Data Mapping**: Handles multiple OpenLibrary API response schemas automatically
 - ✅ **Genre Selection**: Onboarding with 4 favorite genres
 - ✅ **Hamburger Menu**: Navigation between Home, Search, Lists, Settings
 - ✅ **Duplicate Prevention**: Business rules enforcement in repositories
@@ -196,6 +215,9 @@ This application implements **Clean Architecture** with strict separation of con
 - 💾 **Offline-First**: SQLite database with OpenLibrary API fallback
 - 📦 **Standalone Components**: Modern Angular 17+ architecture
 - 🔄 **Smart Caching**: Intelligent data synchronization and storage
+- 📄 **Pagination System**: Proper page-based pagination with offset calculation for API calls
+- 🔀 **Flexible Data Mapping**: Robust mappers handle different JSON schemas (description as string/object, nested authors, multiple cover formats)
+- 📚 **Rich Metadata Display**: Complete book information with subjects, places, people, and time periods as color-coded chips
 - ⚡ **Performance**: Optimized bundle sizes and lazy loading
 
 ### Technologies

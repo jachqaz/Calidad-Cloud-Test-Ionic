@@ -1,10 +1,10 @@
-import {Component, OnInit, signal} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {IonicModule, ModalController} from '@ionic/angular';
 import {CommonModule} from '@angular/common';
-import {BookEntity} from '../../../domain/models';
 import {LibraryFacadeService} from '../../services/library-facade.service';
 import {AddToListModalComponent} from '../../components/add-to-list-modal/add-to-list-modal.component';
+import {I18nService} from '../../services/i18n.service';
 
 @Component({
   selector: 'app-book-detail',
@@ -22,7 +22,8 @@ export class BookDetailPage implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     protected libraryFacade: LibraryFacadeService,
-    private modalController: ModalController
+    private modalController: ModalController,
+    public i18n: I18nService
   ) {
   }
 

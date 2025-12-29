@@ -56,6 +56,22 @@ export class BookRepositoryImpl implements BookRepository {
   }
 
   async getById(id: string): Promise<BookEntity | null> {
+    // Try to get full details from API first
+    if (this.connectivity.connected()) {
+      try {
+        const workKey = `/works/${id}`;
+        const workDetails = await this.openLibrary.getBookDetails(workKey).toPromise();
+        if (workDetails) {
+          const book = BookMapper.fromOpenLibraryWork(workDetails);
+          await this.storage.saveBook(book);
+          return book;
+        }
+      } catch (error) {
+        console.warn('API book details failed, falling back to local:', error);
+      }
+    }
+
+    // Fallback to local storage
     const books = await this.storage.searchBooks(id);
     return books.find(book => book.id === id) || null;
   }

@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-back-button></ion-back-button>
     </ion-buttons>
-    <ion-title>Book Detail</ion-title>
+    <ion-title>{{ i18n.t('book.title') }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -12,16 +12,16 @@
     @if (libraryFacade.bookState.isLoading()) {
       <div class="loading-state">
         <ion-spinner></ion-spinner>
-        <p>Loading details...</p>
+        <p>{{ i18n.t('common.loading') }}</p>
       </div>
     }
 
     @if (libraryFacade.bookState.hasError()) {
       <div class="error-state">
         <ion-icon name="alert-circle-outline" size="large"></ion-icon>
-        <h3>Error loading</h3>
-        <p>Could not get book information</p>
-        <ion-button (click)="retry()" fill="outline">Try Again</ion-button>
+        <h3>{{ i18n.t('common.error') }}</h3>
+        <p>{{ libraryFacade.bookState.errorMessage() }}</p>
+        <ion-button (click)="retry()" fill="outline">{{ i18n.t('common.retry') }}</ion-button>
       </div>
     }
 
@@ -39,28 +39,80 @@
           @if (selectedBook()?.author) {
             <div class="author">
               <ion-icon name="person-outline"></ion-icon>
-              <span>{{ selectedBook()?.author }}</span>
+              <span><strong>{{ i18n.t('book.author') }}:</strong> {{ selectedBook()?.author }}</span>
             </div>
           }
 
           @if (selectedBook()?.publishedYear) {
             <div class="year">
               <ion-icon name="calendar-outline"></ion-icon>
-              <span>{{ selectedBook()?.publishedYear }}</span>
+              <span><strong>{{ i18n.t('book.published') }}:</strong> {{ selectedBook()?.publishedYear }}</span>
             </div>
           }
 
           @if (selectedBook()?.genre) {
             <div class="genre">
               <ion-icon name="library-outline"></ion-icon>
-              <span>{{ selectedBook()?.genre }}</span>
+              <span><strong>Genre:</strong> {{ selectedBook()?.genre }}</span>
             </div>
           }
 
           @if (selectedBook()?.description) {
             <div class="description">
-              <h3>Description</h3>
+              <h3>{{ i18n.t('book.description') }}</h3>
               <p>{{ selectedBook()?.description }}</p>
+            </div>
+          }
+
+          @if (selectedBook()?.subjects && selectedBook()!.subjects!.length > 0) {
+            <div class="subjects">
+              <h3>{{ i18n.t('book.subjects') }}</h3>
+              <div class="tags">
+                @for (subject of selectedBook()!.subjects!.slice(0, 10); track subject) {
+                  <ion-chip color="primary">
+                    <ion-label>{{ subject }}</ion-label>
+                  </ion-chip>
+                }
+              </div>
+            </div>
+          }
+
+          @if (selectedBook()?.subjectPlaces && selectedBook()!.subjectPlaces!.length > 0) {
+            <div class="places">
+              <h3>{{ i18n.t('book.places') }}</h3>
+              <div class="tags">
+                @for (place of selectedBook()!.subjectPlaces!; track place) {
+                  <ion-chip color="secondary">
+                    <ion-label>{{ place }}</ion-label>
+                  </ion-chip>
+                }
+              </div>
+            </div>
+          }
+
+          @if (selectedBook()?.subjectPeople && selectedBook()!.subjectPeople!.length > 0) {
+            <div class="people">
+              <h3>{{ i18n.t('book.people') }}</h3>
+              <div class="tags">
+                @for (person of selectedBook()!.subjectPeople!; track person) {
+                  <ion-chip color="tertiary">
+                    <ion-label>{{ person }}</ion-label>
+                  </ion-chip>
+                }
+              </div>
+            </div>
+          }
+
+          @if (selectedBook()?.subjectTimes && selectedBook()!.subjectTimes!.length > 0) {
+            <div class="times">
+              <h3>{{ i18n.t('book.times') }}</h3>
+              <div class="tags">
+                @for (time of selectedBook()!.subjectTimes!; track time) {
+                  <ion-chip color="success">
+                    <ion-label>{{ time }}</ion-label>
+                  </ion-chip>
+                }
+              </div>
             </div>
           }
         </div>
