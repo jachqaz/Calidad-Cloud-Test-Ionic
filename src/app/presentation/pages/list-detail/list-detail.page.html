@@ -12,16 +12,16 @@
     @if (isLoading()) {
       <div class="loading-state">
         <ion-spinner></ion-spinner>
-        <p>Loading books...</p>
+        <p>{{ i18n.t('common.loading') }}</p>
       </div>
     }
 
     @if (!isLoading() && books().length === 0) {
       <div class="empty-state">
         <ion-icon name="library-outline" size="large"></ion-icon>
-        <h2>Empty list</h2>
-        <p>You haven't added books to this list yet</p>
-        <p>Search for books and add them using the "Add to list" button</p>
+        <h2>{{ i18n.t('list.empty') }}</h2>
+        <p>{{ i18n.t('list.no-books-yet') }}</p>
+        <p>{{ i18n.t('list.search-and-add') }}</p>
       </div>
     }
 
@@ -49,7 +49,7 @@
                 (click)="removeBook(book)"
                 color="danger">
                 <ion-icon name="trash-outline"></ion-icon>
-                Remove
+                {{ i18n.t('common.remove') }}
               </ion-item-option>
             </ion-item-options>
           </ion-item-sliding>
@@ -58,7 +58,7 @@
 
       <div class="book-count">
         <ion-note>
-          {{ books().length }} {{ books().length === 1 ? 'book' : 'books' }} in this list
+          {{ books().length }} {{ books().length === 1 ? i18n.t('common.book') : i18n.t('common.books') }} {{ i18n.t('list.in-this-list') }}
         </ion-note>
       </div>
     }

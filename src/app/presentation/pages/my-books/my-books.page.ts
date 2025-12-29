@@ -82,7 +82,9 @@ export class MyBooksPage implements OnInit {
   async handleCreateList(name: string, description?: string) {
     try {
       await this.storage.createCustomList({name, description, bookCount: 0});
-      await this.loadLists();
+
+      const lists = await this.storage.getCustomLists();
+      this.customLists.set(lists);
 
       const toast = document.createElement('ion-toast');
       toast.message = `Lista "${name}" creada exitosamente`;

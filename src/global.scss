@@ -37,3 +37,15 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+/* Mobile navigation bar spacing */
+
+@media (max-width: 768px) {
+  ion-content {
+    --padding-bottom: 20px !important;
+  }
+
+  ion-tab-bar {
+    padding-bottom: 20px !important;
+  }
+}

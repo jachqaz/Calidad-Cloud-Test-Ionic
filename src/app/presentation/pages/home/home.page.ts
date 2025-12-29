@@ -16,7 +16,7 @@ import {
   IonTitle,
   IonToolbar
 } from '@ionic/angular/standalone';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {CommonModule} from '@angular/common';
 import {CategoryEntity} from '../../../domain/models';
 import {StorageService} from '../../../data/services/storage.service';
@@ -35,6 +35,7 @@ export class HomePage implements OnInit {
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private storage: StorageService,
     public i18n: I18nService
   ) {
@@ -42,6 +43,27 @@ export class HomePage implements OnInit {
   }
 
   async ngOnInit() {
+    // Don't load genres on init, wait for ionViewDidEnter
+  }
+
+  async ionViewWillEnter() {
+    // Don't load here, wait for ionViewDidEnter
+  }
+
+  async ionViewDidEnter() {
+    // Only load genres when view is fully entered
+
+    // Check if we have a refresh query param (from genre selection)
+    const refreshParam = this.route.snapshot.queryParamMap.get('refresh');
+    if (refreshParam) {
+      // Clear the query param
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: {},
+        replaceUrl: true
+      });
+    }
+
     await this.loadSelectedGenres();
   }
 

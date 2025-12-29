@@ -4,6 +4,7 @@ import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {BookEntity, CustomListEntity, MAX_CUSTOM_LISTS} from '../../../domain/models';
 import {StorageService} from '../../../data/services/storage.service';
+import {I18nService} from '../../services/i18n.service';
 import {addIcons} from 'ionicons';
 import {addOutline, checkmarkOutline} from 'ionicons/icons';
 
@@ -24,7 +25,8 @@ export class AddToListModalComponent implements OnInit {
 
   constructor(
     private modalController: ModalController,
-    private storage: StorageService
+    private storage: StorageService,
+    public i18n: I18nService
   ) {
     addIcons({addOutline, checkmarkOutline});
   }

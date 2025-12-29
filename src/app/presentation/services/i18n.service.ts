@@ -82,6 +82,15 @@ const translations = {
     'list.add-books': 'Agrega algunos libros a esta lista',
     'list.max-reached': 'Máximo 3 listas permitidas',
     'list.created-count': 'listas creadas',
+    'list.add-to-list': 'Agregar a Lista',
+    'list.no-lists': 'Sin listas',
+    'list.create-first': 'Crea tu primera lista personalizada',
+    'list.select-list': 'Selecciona una lista',
+    'list.new-list-name': 'Nombre de nueva lista',
+    'list.description-optional': 'Descripción (opcional)',
+    'list.create-and-add': 'Crear Lista y Agregar',
+    'list.no-books-yet': 'Aún no has agregado libros a esta lista',
+    'list.search-and-add': 'Busca libros y agrégalos usando el botón "Agregar a lista"',
 
     // Loading states
     'loading.more-books': 'Cargando más libros...',
@@ -102,7 +111,13 @@ const translations = {
     'common.delete': 'Eliminar',
     'common.edit': 'Editar',
     'common.book': 'libro',
-    'common.books': 'libros'
+    'common.books': 'libros',
+    'common.remove': 'Eliminar',
+    'common.cancel': 'Cancelar',
+    'list.in-this-list': 'en esta lista',
+    'book.remove-book': 'Eliminar Libro',
+    'book.remove-confirm': '¿Quieres eliminar',
+    'book.from-list': 'de esta lista'
   },
   en: {
     // Navigation
@@ -154,6 +169,15 @@ const translations = {
     'list.add-books': 'Add some books to this list',
     'list.max-reached': 'Maximum 3 lists allowed',
     'list.created-count': 'lists created',
+    'list.add-to-list': 'Add to List',
+    'list.no-lists': 'No lists',
+    'list.create-first': 'Create your first custom list',
+    'list.select-list': 'Select a list',
+    'list.new-list-name': 'New list name',
+    'list.description-optional': 'Description (optional)',
+    'list.create-and-add': 'Create List and Add',
+    'list.no-books-yet': 'You haven\'t added books to this list yet',
+    'list.search-and-add': 'Search for books and add them using the "Add to list" button',
 
     // Loading states
     'loading.more-books': 'Loading more books...',
@@ -174,6 +198,12 @@ const translations = {
     'common.delete': 'Delete',
     'common.edit': 'Edit',
     'common.book': 'book',
-    'common.books': 'books'
+    'common.books': 'books',
+    'common.remove': 'Remove',
+    'common.cancel': 'Cancel',
+    'list.in-this-list': 'in this list',
+    'book.remove-book': 'Remove Book',
+    'book.remove-confirm': 'Do you want to remove',
+    'book.from-list': 'from this list'
   }
 };

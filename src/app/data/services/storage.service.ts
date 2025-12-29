@@ -13,57 +13,46 @@ export class StorageService {
   // Genre operations
   async saveSelectedGenres(genres: CategoryEntity[]): Promise<void> {
     try {
-      // For web development, also save to localStorage as fallback
-      if (!Capacitor.isNativePlatform()) {
-        localStorage.setItem('selected_genres', JSON.stringify(genres));
-      }
+      localStorage.setItem('selected_genres', JSON.stringify(genres));
 
-      await this.sqlite.executeRun('DELETE FROM selected_genres');
+      if (Capacitor.isNativePlatform()) {
+        await this.sqlite.executeRun('DELETE FROM selected_genres');
 
-      for (const genre of genres) {
-        await this.sqlite.executeRun(
-          'INSERT INTO selected_genres (id, name, key) VALUES (?, ?, ?)',
-          [genre.id, genre.name, genre.key]
-        );
+        for (const genre of genres) {
+          await this.sqlite.executeRun(
+            'INSERT INTO selected_genres (id, name, key) VALUES (?, ?, ?)',
+            [genre.id, genre.name, genre.key]
+          );
+        }
       }
     } catch (error) {
       console.error('Error saving genres:', error);
-      throw error;
+      localStorage.setItem('selected_genres', JSON.stringify(genres));
     }
   }
 
   async getSelectedGenres(): Promise<CategoryEntity[]> {
     try {
-      const result = await this.sqlite.executeQuery('SELECT * FROM selected_genres ORDER BY name');
-
-      // If no results from SQLite and we're in web, try localStorage fallback
-      if ((!result.values || result.values.length === 0) && !Capacitor.isNativePlatform()) {
-        const stored = localStorage.getItem('selected_genres');
-        if (stored) {
-          return JSON.parse(stored);
-        }
+      const stored = localStorage.getItem('selected_genres');
+      if (stored) {
+        return JSON.parse(stored);
       }
 
-      return result.values || [];
+      if (Capacitor.isNativePlatform()) {
+        const result = await this.sqlite.executeQuery('SELECT * FROM selected_genres ORDER BY name');
+        return result.values || [];
+      }
+
+      return [];
     } catch (error) {
       console.error('Error getting selected genres:', error);
-
-      // Fallback to localStorage in case of error
-      if (!Capacitor.isNativePlatform()) {
-        const stored = localStorage.getItem('selected_genres');
-        if (stored) {
-          return JSON.parse(stored);
-        }
-      }
-
       return [];
     }
   }
 
   // Book operations
   async saveBook(book: BookEntity): Promise<void> {
-    // For web platform, use localStorage
-    if (!Capacitor.isNativePlatform()) {
+    try {
       const cachedBooks = JSON.parse(localStorage.getItem('cached_books') || '[]');
       const existingIndex = cachedBooks.findIndex((b: any) => b.id === book.id);
 
@@ -74,27 +63,34 @@ export class StorageService {
       }
 
       localStorage.setItem('cached_books', JSON.stringify(cachedBooks));
-      return;
+
+      if (Capacitor.isNativePlatform()) {
+        try {
+          const query = `
+            INSERT OR REPLACE INTO cached_books
+            (id, title, author, genre, isbn, published_year, description, cover_url, rating, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+          `;
+
+          await this.sqlite.executeRun(query, [
+            book.id,
+            book.title,
+            book.author,
+            book.genre,
+            book.isbn,
+            book.publishedYear,
+            book.description,
+            book.coverUrl,
+            book.rating
+          ]);
+        } catch (error) {
+          console.warn('SQLite saveBook failed, using localStorage only:', error);
+        }
+      }
+    } catch (error) {
+      console.error('Error saving book:', error);
+      throw error;
     }
-
-    // SQLite operations for native platforms
-    const query = `
-      INSERT OR REPLACE INTO cached_books
-      (id, title, author, genre, isbn, published_year, description, cover_url, rating, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-    `;
-
-    await this.sqlite.executeRun(query, [
-      book.id,
-      book.title,
-      book.author,
-      book.genre,
-      book.isbn,
-      book.publishedYear,
-      book.description,
-      book.coverUrl,
-      book.rating
-    ]);
   }
 
   async getBooksByGenre(genre: string): Promise<BookEntity[]> {
@@ -108,7 +104,7 @@ export class StorageService {
 
   async searchBooks(query: string): Promise<BookEntity[]> {
     const result = await this.sqlite.executeQuery(
-      'SELECT * FROM cached_books WHERE title LIKE ? OR authors LIKE ? ORDER BY title',
+      'SELECT * FROM cached_books WHERE title LIKE ? OR author LIKE ? ORDER BY title',
       [`%${query}%`, `%${query}%`]
     );
 
@@ -150,25 +146,21 @@ export class StorageService {
       updatedAt: new Date().toISOString()
     };
 
-    try {
-      await this.sqlite.executeRun(
-        'INSERT INTO custom_lists (id, name, description) VALUES (?, ?, ?)',
-        [id, newList.name, newList.description]
-      );
-    } catch (error) {
-      // Fallback to localStorage for web platform
-      if (!Capacitor.isNativePlatform()) {
-        const updatedLists = [...existingLists, newList];
-        localStorage.setItem('custom_lists', JSON.stringify(updatedLists));
-      } else {
-        throw error;
-      }
-    }
+    // Always save to localStorage
+    const updatedLists = [...existingLists, newList];
+    localStorage.setItem('custom_lists', JSON.stringify(updatedLists));
+    console.log('Saved to localStorage:', updatedLists);
 
-    // Also save to localStorage for web platform consistency
-    if (!Capacitor.isNativePlatform()) {
-      const updatedLists = [...existingLists, newList];
-      localStorage.setItem('custom_lists', JSON.stringify(updatedLists));
+    // Also try SQLite for native platforms
+    if (Capacitor.isNativePlatform()) {
+      try {
+        await this.sqlite.executeRun(
+          'INSERT INTO custom_lists (id, name, description) VALUES (?, ?, ?)',
+          [id, newList.name, newList.description]
+        );
+      } catch (error) {
+        console.warn('SQLite save failed, using localStorage only:', error);
+      }
     }
 
     return id;
@@ -176,55 +168,44 @@ export class StorageService {
 
   async getCustomLists(): Promise<CustomListEntity[]> {
     try {
-      const result = await this.sqlite.executeQuery(
-        'SELECT * FROM custom_lists ORDER BY created_at DESC'
-      );
+      const stored = localStorage.getItem('custom_lists');
 
-      // If no results from SQLite and we're in web, try localStorage fallback
-      if ((!result.values || result.values.length === 0) && !Capacitor.isNativePlatform()) {
-        const stored = localStorage.getItem('custom_lists');
-        if (stored) {
-          return JSON.parse(stored);
-        }
+      if (stored) {
+        return JSON.parse(stored);
       }
 
-      return result.values || [];
+      if (Capacitor.isNativePlatform()) {
+        const result = await this.sqlite.executeQuery(
+          'SELECT * FROM custom_lists ORDER BY created_at DESC'
+        );
+        return result.values || [];
+      }
+
+      return [];
     } catch (error) {
       console.error('Error getting custom lists:', error);
-
-      // Fallback to localStorage in case of error
-      if (!Capacitor.isNativePlatform()) {
-        const stored = localStorage.getItem('custom_lists');
-        if (stored) {
-          return JSON.parse(stored);
-        }
-      }
-
       return [];
     }
   }
 
   async addBookToList(listId: string, bookId: string): Promise<void> {
-    // For web platform, use localStorage
-    if (!Capacitor.isNativePlatform()) {
+    try {
       const lists = await this.getCustomLists();
       const books = JSON.parse(localStorage.getItem('list_books') || '[]');
 
-      // Check for duplicates
       const exists = books.find((b: any) => b.listId === listId && b.bookId === bookId);
       if (exists) {
         throw new Error('El libro ya está en esta lista');
       }
 
-      // Add book to list
-      books.push({
+      const newBookEntry = {
         id: Date.now().toString(),
         listId,
         bookId,
         addedAt: new Date().toISOString()
-      });
+      };
+      books.push(newBookEntry);
 
-      // Update book count
       const updatedLists = lists.map(l => {
         if (l.id === listId) {
           return {...l, bookCount: (l.bookCount || 0) + 1};
@@ -234,44 +215,57 @@ export class StorageService {
 
       localStorage.setItem('list_books', JSON.stringify(books));
       localStorage.setItem('custom_lists', JSON.stringify(updatedLists));
-      return;
+
+      if (Capacitor.isNativePlatform()) {
+        try {
+          const existingBooks = await this.sqlite.executeQuery(
+            'SELECT id FROM list_books WHERE list_id = ? AND book_id = ?',
+            [listId, bookId]
+          );
+
+          if (existingBooks.values && existingBooks.values.length > 0) {
+            return;
+          }
+
+          await this.sqlite.executeRun(
+            'INSERT INTO list_books (id, list_id, book_id) VALUES (?, ?, ?)',
+            [newBookEntry.id, listId, bookId]
+          );
+
+          await this.sqlite.executeRun(
+            'UPDATE custom_lists SET book_count = (SELECT COUNT(*) FROM list_books WHERE list_id = ?) WHERE id = ?',
+            [listId, listId]
+          );
+        } catch (error) {
+          console.warn('SQLite addBookToList failed, using localStorage only:', error);
+        }
+      }
+    } catch (error) {
+      console.error('Error in addBookToList:', error);
+      throw error;
     }
-
-    // SQLite operations for native platforms
-    const existingBooks = await this.sqlite.executeQuery(
-      'SELECT id FROM list_books WHERE list_id = ? AND book_id = ?',
-      [listId, bookId]
-    );
-
-    if (existingBooks.values && existingBooks.values.length > 0) {
-      throw new Error('El libro ya está en esta lista');
-    }
-
-    const id = Date.now().toString();
-    await this.sqlite.executeRun(
-      'INSERT INTO list_books (id, list_id, book_id) VALUES (?, ?, ?)',
-      [id, listId, bookId]
-    );
-
-    // Update book count
-    await this.sqlite.executeRun(
-      'UPDATE custom_lists SET book_count = (SELECT COUNT(*) FROM list_books WHERE list_id = ?) WHERE id = ?',
-      [listId, listId]
-    );
   }
 
   async deleteCustomList(listId: string): Promise<void> {
-    // Always update localStorage for web platform
-    if (!Capacitor.isNativePlatform()) {
-      const lists = await this.getCustomLists();
-      const updatedLists = lists.filter(l => l.id !== listId);
-      localStorage.setItem('custom_lists', JSON.stringify(updatedLists));
-      return;
-    }
+    // Always update localStorage
+    const lists = await this.getCustomLists();
+    const updatedLists = lists.filter(l => l.id !== listId);
+    localStorage.setItem('custom_lists', JSON.stringify(updatedLists));
 
-    // SQLite operations for native platforms
-    await this.sqlite.executeRun('DELETE FROM custom_lists WHERE id = ?', [listId]);
-    // list_books will be deleted automatically due to CASCADE
+    // Also remove associated list_books entries
+    const listBooks = JSON.parse(localStorage.getItem('list_books') || '[]');
+    const updatedListBooks = listBooks.filter((lb: any) => lb.listId !== listId);
+    localStorage.setItem('list_books', JSON.stringify(updatedListBooks));
+
+    // Also try SQLite for native platforms
+    if (Capacitor.isNativePlatform()) {
+      try {
+        await this.sqlite.executeRun('DELETE FROM custom_lists WHERE id = ?', [listId]);
+        // list_books will be deleted automatically due to CASCADE
+      } catch (error) {
+        console.warn('SQLite deleteCustomList failed, using localStorage only:', error);
+      }
+    }
   }
 
   async updateCustomList(listId: string, updates: Partial<CustomListEntity>): Promise<void> {
@@ -295,52 +289,54 @@ export class StorageService {
       }
     }
 
-    // Always update localStorage for web platform
-    if (!Capacitor.isNativePlatform()) {
-      const lists = await this.getCustomLists();
-      const updatedLists = lists.map(l => {
-        if (l.id === listId) {
-          return {
-            ...l,
-            ...updates,
-            name: updates.name?.trim() || l.name,
-            description: updates.description?.trim() || l.description,
-            updatedAt: new Date()
-          };
+    // Always update localStorage
+    const lists = await this.getCustomLists();
+    const updatedLists = lists.map(l => {
+      if (l.id === listId) {
+        return {
+          ...l,
+          ...updates,
+          name: updates.name?.trim() || l.name,
+          description: updates.description?.trim() || l.description,
+          updatedAt: new Date().toISOString()
+        };
+      }
+      return l;
+    });
+    localStorage.setItem('custom_lists', JSON.stringify(updatedLists));
+
+    // Also try SQLite for native platforms
+    if (Capacitor.isNativePlatform()) {
+      try {
+        const setClause = [];
+        const values = [];
+
+        if (updates.name) {
+          setClause.push('name = ?');
+          values.push(updates.name.trim());
         }
-        return l;
-      });
-      localStorage.setItem('custom_lists', JSON.stringify(updatedLists));
-      return;
-    }
+        if (updates.description !== undefined) {
+          setClause.push('description = ?');
+          values.push(updates.description?.trim() || null);
+        }
 
-    // SQLite operations for native platforms
-    const setClause = [];
-    const values = [];
+        if (setClause.length > 0) {
+          setClause.push('updated_at = CURRENT_TIMESTAMP');
+          values.push(listId);
 
-    if (updates.name) {
-      setClause.push('name = ?');
-      values.push(updates.name.trim());
-    }
-    if (updates.description !== undefined) {
-      setClause.push('description = ?');
-      values.push(updates.description?.trim() || null);
-    }
-
-    if (setClause.length > 0) {
-      setClause.push('updated_at = CURRENT_TIMESTAMP');
-      values.push(listId);
-
-      await this.sqlite.executeRun(
-        `UPDATE custom_lists SET ${setClause.join(', ')} WHERE id = ?`,
-        values
-      );
+          await this.sqlite.executeRun(
+            `UPDATE custom_lists SET ${setClause.join(', ')} WHERE id = ?`,
+            values
+          );
+        }
+      } catch (error) {
+        console.warn('SQLite updateCustomList failed, using localStorage only:', error);
+      }
     }
   }
 
   async getBooksInList(listId: string): Promise<BookEntity[]> {
-    // For web platform, use localStorage
-    if (!Capacitor.isNativePlatform()) {
+    try {
       const listBooks = JSON.parse(localStorage.getItem('list_books') || '[]');
       const cachedBooks = JSON.parse(localStorage.getItem('cached_books') || '[]');
 
@@ -348,53 +344,60 @@ export class StorageService {
         .filter((lb: any) => lb.listId === listId)
         .map((lb: any) => lb.bookId);
 
-      return cachedBooks.filter((book: any) => bookIds.includes(book.id));
+      const booksInList = cachedBooks.filter((book: any) => bookIds.includes(book.id));
+
+      if (booksInList.length === 0 && bookIds.length > 0 && Capacitor.isNativePlatform()) {
+        const result = await this.sqlite.executeQuery(
+          `SELECT cb.* FROM cached_books cb
+           INNER JOIN list_books lb ON cb.id = lb.book_id
+           WHERE lb.list_id = ?`,
+          [listId]
+        );
+        return (result.values || []).map(this.mapRowToBook);
+      }
+
+      return booksInList;
+    } catch (error) {
+      console.error('Error getting books in list:', error);
+      return [];
     }
-
-    // SQLite operations for native platforms
-    const result = await this.sqlite.executeQuery(`
-      SELECT cb.* FROM cached_books cb
-      INNER JOIN list_books lb ON cb.id = lb.book_id
-      WHERE lb.list_id = ?
-      ORDER BY lb.added_at DESC
-    `, [listId]);
-
-    return (result.values || []).map(this.mapRowToBook);
   }
 
   async removeBookFromList(listId: string, bookId: string): Promise<void> {
-    // For web platform, use localStorage
-    if (!Capacitor.isNativePlatform()) {
-      const lists = await this.getCustomLists();
-      const books = JSON.parse(localStorage.getItem('list_books') || '[]');
+    // Always use localStorage
+    const lists = await this.getCustomLists();
+    const books = JSON.parse(localStorage.getItem('list_books') || '[]');
 
-      // Remove book from list
-      const updatedBooks = books.filter((b: any) => !(b.listId === listId && b.bookId === bookId));
-
-      // Update book count
-      const updatedLists = lists.map(l => {
-        if (l.id === listId) {
-          return {...l, bookCount: Math.max(0, (l.bookCount || 0) - 1)};
-        }
-        return l;
-      });
-
-      localStorage.setItem('list_books', JSON.stringify(updatedBooks));
-      localStorage.setItem('custom_lists', JSON.stringify(updatedLists));
-      return;
-    }
-
-    // SQLite operations for native platforms
-    await this.sqlite.executeRun(
-      'DELETE FROM list_books WHERE list_id = ? AND book_id = ?',
-      [listId, bookId]
-    );
+    // Remove book from list
+    const updatedBooks = books.filter((b: any) => !(b.listId === listId && b.bookId === bookId));
 
     // Update book count
-    await this.sqlite.executeRun(
-      'UPDATE custom_lists SET book_count = (SELECT COUNT(*) FROM list_books WHERE list_id = ?) WHERE id = ?',
-      [listId, listId]
-    );
+    const updatedLists = lists.map(l => {
+      if (l.id === listId) {
+        return {...l, bookCount: Math.max(0, (l.bookCount || 0) - 1)};
+      }
+      return l;
+    });
+
+    localStorage.setItem('list_books', JSON.stringify(updatedBooks));
+    localStorage.setItem('custom_lists', JSON.stringify(updatedLists));
+
+    // Also try SQLite for native platforms
+    if (Capacitor.isNativePlatform()) {
+      try {
+        await this.sqlite.executeRun(
+          'DELETE FROM list_books WHERE list_id = ? AND book_id = ?',
+          [listId, bookId]
+        );
+
+        await this.sqlite.executeRun(
+          'UPDATE custom_lists SET book_count = (SELECT COUNT(*) FROM list_books WHERE list_id = ?) WHERE id = ?',
+          [listId, listId]
+        );
+      } catch (error) {
+        console.warn('SQLite removeBookFromList failed, using localStorage only:', error);
+      }
+    }
   }
 
   private mapRowToBook(row: any): BookEntity {

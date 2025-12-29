@@ -5,6 +5,7 @@ import {CommonModule} from '@angular/common';
 import {BookEntity} from '../../../domain/models';
 import {LibraryFacadeService} from '../../services/library-facade.service';
 import {StorageService} from '../../../data/services/storage.service';
+import {I18nService} from '../../services/i18n.service';
 
 @Component({
   selector: 'app-list-detail',
@@ -24,13 +25,19 @@ export class ListDetailPage implements OnInit {
     private router: Router,
     protected libraryFacade: LibraryFacadeService,
     private alertController: AlertController,
-    private storage: StorageService
+    private storage: StorageService,
+    public i18n: I18nService
   ) {
   }
 
   async ngOnInit() {
     this.listId = this.route.snapshot.paramMap.get('id') || '';
     this.listName = this.route.snapshot.queryParamMap.get('name') || 'Lista';
+    await this.loadBooks();
+  }
+
+  async ionViewWillEnter() {
+    // Reload books every time the page is entered
     await this.loadBooks();
   }
 
@@ -53,15 +60,15 @@ export class ListDetailPage implements OnInit {
 
   async removeBook(book: BookEntity) {
     const alert = await this.alertController.create({
-      header: 'Remove Book',
-      message: `Do you want to remove "${book.title}" from this list?`,
+      header: this.i18n.t('book.remove-book'),
+      message: `${this.i18n.t('book.remove-confirm')} "${book.title}" ${this.i18n.t('book.from-list')}?`,
       buttons: [
         {
-          text: 'Cancel',
+          text: this.i18n.t('common.cancel'),
           role: 'cancel'
         },
         {
-          text: 'Remove',
+          text: this.i18n.t('common.remove'),
           role: 'destructive',
           handler: async () => {
             await this.handleRemoveBook(book);

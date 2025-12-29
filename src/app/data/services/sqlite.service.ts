@@ -10,6 +10,14 @@ export class SqliteService {
   private db: SQLiteDBConnection | null = null;
   private isInitialized = signal(false);
   private isWebPlatform = Capacitor.getPlatform() === 'web';
+  private static instance: SqliteService;
+
+  constructor() {
+    if (SqliteService.instance) {
+      return SqliteService.instance;
+    }
+    SqliteService.instance = this;
+  }
 
   async initializeDatabase(): Promise<void> {
     if (this.isInitialized()) return;
@@ -18,7 +26,6 @@ export class SqliteService {
       console.log('Initializing SQLite database...');
 
       if (this.isWebPlatform) {
-        // For web platform, use localStorage as fallback
         console.log('Using localStorage fallback for web platform');
         this.isInitialized.set(true);
         return;
@@ -41,6 +48,12 @@ export class SqliteService {
       this.isInitialized.set(true);
       console.log('Database initialization completed');
     } catch (error) {
+      // If connection already exists, just mark as initialized
+      if ((error as any)?.message?.includes('already exists')) {
+        this.isInitialized.set(true);
+        console.log('Database already initialized');
+        return;
+      }
       console.error('Database initialization failed:', error);
       throw error;
     }
@@ -48,22 +61,36 @@ export class SqliteService {
 
   async executeQuery(query: string, values?: any[]): Promise<any> {
     if (this.isWebPlatform) {
-      return {values: []}; // Return empty result for web
+      return {values: []};
     }
-    if (!this.db) {
+
+    if (!this.isInitialized()) {
       await this.initializeDatabase();
     }
-    return await this.db!.query(query, values);
+
+    // If still no db after initialization, return empty result
+    if (!this.db) {
+      return {values: []};
+    }
+
+    return await this.db.query(query, values);
   }
 
   async executeRun(query: string, values?: any[]): Promise<any> {
     if (this.isWebPlatform) {
-      return {changes: {changes: 0}}; // Return mock result for web
+      return {changes: {changes: 0}};
     }
-    if (!this.db) {
+
+    if (!this.isInitialized()) {
       await this.initializeDatabase();
     }
-    return await this.db!.run(query, values);
+
+    // If still no db after initialization, return empty result
+    if (!this.db) {
+      return {changes: {changes: 0}};
+    }
+
+    return await this.db.run(query, values);
   }
 
   async close(): Promise<void> {
@@ -116,6 +143,8 @@ export class SqliteService {
          TEXT
          NOT
          NULL,
+         author
+         TEXT,
          authors
          TEXT,
          cover_id
@@ -123,6 +152,8 @@ export class SqliteService {
          cover_url
          TEXT,
          first_publish_year
+         INTEGER,
+         published_year
          INTEGER,
          subjects
          TEXT,
@@ -229,6 +260,19 @@ export class SqliteService {
 
     for (const query of queries) {
       await this.db.execute(query);
+    }
+
+    // Add missing columns if they don't exist
+    try {
+      await this.db.execute('ALTER TABLE cached_books ADD COLUMN author TEXT');
+    } catch (e) {
+      // Column already exists
+    }
+
+    try {
+      await this.db.execute('ALTER TABLE cached_books ADD COLUMN published_year INTEGER');
+    } catch (e) {
+      // Column already exists
     }
   }
 }

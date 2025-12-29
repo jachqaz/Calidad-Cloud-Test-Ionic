@@ -1,8 +1,8 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Add to List</ion-title>
+      <ion-title>{{ i18n.t('list.add-to-list') }}</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="dismiss()">Close</ion-button>
+        <ion-button (click)="dismiss()">{{ i18n.t('common.close') }}</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -18,22 +18,22 @@
   @if (customLists().length === 0) {
     <div class="empty-state">
       <ion-icon name="bookmarks-outline" size="large"></ion-icon>
-      <h3>No lists</h3>
-      <p>Create your first custom list</p>
+        <h3>{{ i18n.t('list.no-lists') }}</h3>
+        <p>{{ i18n.t('list.create-first') }}</p>
     </div>
   }
 
   @if (customLists().length > 0) {
     <ion-list>
       <ion-list-header>
-        <ion-label>Select a list</ion-label>
+          <ion-label>{{ i18n.t('list.select-list') }}</ion-label>
       </ion-list-header>
 
       @for (list of customLists(); track list.id) {
         <ion-item (click)="addToList(list)" button>
           <ion-label>
             <h2>{{ list.name }}</h2>
-            <p>{{ list.bookCount }} books</p>
+              <p>{{ list.bookCount }} {{ list.bookCount === 1 ? i18n.t('common.book') : i18n.t('common.books') }}</p>
             @if (list.description) {
               <p>{{ list.description }}</p>
             }
@@ -50,7 +50,7 @@
         <ion-input
           [(ngModel)]="newListName"
           maxlength="50"
-          placeholder="New list name">
+          [placeholder]="i18n.t('list.new-list-name')">
         </ion-input>
       </ion-item>
 
@@ -58,7 +58,7 @@
         <ion-textarea
           [(ngModel)]="newListDescription"
           maxlength="200"
-          placeholder="Description (optional)"
+          [placeholder]="i18n.t('list.description-optional')"
           rows="2">
         </ion-textarea>
       </ion-item>
@@ -70,7 +70,7 @@
           expand="block"
           fill="outline">
           <ion-icon name="add-outline" slot="start"></ion-icon>
-          Create List and Add
+            {{ i18n.t('list.create-and-add') }}
         </ion-button>
       </div>
     </div>
@@ -79,8 +79,7 @@
   @if (customLists().length >= MAX_CUSTOM_LISTS) {
     <div class="max-lists-info">
       <ion-note>
-        Maximum {{ MAX_CUSTOM_LISTS }} lists allowed.
-        Delete an existing list to create a new one.
+          {{ i18n.t('list.max-lists') }}
       </ion-note>
     </div>
   }

@@ -18,38 +18,36 @@ export class BookRepositoryImpl implements BookRepository {
   }
 
   async search(query: string, page: number = 1): Promise<BookEntity[]> {
-    if (this.connectivity.connected()) {
-      try {
-        const response = await this.openLibrary.searchBooks(query, page).toPromise();
-        if (response?.docs) {
-          const books = response.docs.map(doc => BookMapper.fromOpenLibrarySearchDoc(doc));
-          for (const book of books) {
-            await this.storage.saveBook(book);
-          }
-          return books;
+    // Always try API first, then fallback to local
+    try {
+      const response = await this.openLibrary.searchBooks(query, page).toPromise();
+      if (response?.docs) {
+        const books = response.docs.map(doc => BookMapper.fromOpenLibrarySearchDoc(doc));
+        for (const book of books) {
+          await this.storage.saveBook(book);
         }
-      } catch (error) {
-        console.warn('API search failed, falling back to local:', error);
+        return books;
       }
+    } catch (error) {
+      console.warn('API search failed, falling back to local:', error);
     }
 
     return await this.storage.searchBooks(query);
   }
 
   async getByGenre(genre: string): Promise<BookEntity[]> {
-    if (this.connectivity.connected()) {
-      try {
-        const response = await this.openLibrary.getBooksBySubject(genre).toPromise();
-        if (response?.works) {
-          const books = response.works.map(work => BookMapper.fromOpenLibraryWork(work, genre));
-          for (const book of books) {
-            await this.storage.saveBook(book);
-          }
-          return books;
+    // Always try API first, then fallback to local
+    try {
+      const response = await this.openLibrary.getBooksBySubject(genre).toPromise();
+      if (response?.works) {
+        const books = response.works.map(work => BookMapper.fromOpenLibraryWork(work, genre));
+        for (const book of books) {
+          await this.storage.saveBook(book);
         }
-      } catch (error) {
-        console.warn('API genre search failed, falling back to local:', error);
+        return books;
       }
+    } catch (error) {
+      console.warn('API genre search failed, falling back to local:', error);
     }
 
     return await this.storage.getBooksByGenre(genre);
@@ -57,18 +55,16 @@ export class BookRepositoryImpl implements BookRepository {
 
   async getById(id: string): Promise<BookEntity | null> {
     // Try to get full details from API first
-    if (this.connectivity.connected()) {
-      try {
-        const workKey = `/works/${id}`;
-        const workDetails = await this.openLibrary.getBookDetails(workKey).toPromise();
-        if (workDetails) {
-          const book = BookMapper.fromOpenLibraryWork(workDetails);
-          await this.storage.saveBook(book);
-          return book;
-        }
-      } catch (error) {
-        console.warn('API book details failed, falling back to local:', error);
+    try {
+      const workKey = `/works/${id}`;
+      const workDetails = await this.openLibrary.getBookDetails(workKey).toPromise();
+      if (workDetails) {
+        const book = BookMapper.fromOpenLibraryWork(workDetails);
+        await this.storage.saveBook(book);
+        return book;
       }
+    } catch (error) {
+      console.warn('API book details failed, falling back to local:', error);
     }
 
     // Fallback to local storage

@@ -69,11 +69,13 @@ export class GenreSelectionPage implements OnInit {
       try {
         await this.storage.saveSelectedGenres(this.selectedGenres());
 
+        const saved = await this.storage.getSelectedGenres();
+
         const isFromSettings = this.router.url.includes('/settings/genre-selection');
         if (isFromSettings) {
-          this.router.navigate(['/settings']);
+          await this.router.navigate(['/settings']);
         } else {
-          this.router.navigate(['/home']);
+          window.location.href = '/home';
         }
       } catch (error) {
         console.error('Error saving genres or navigating:', error);
