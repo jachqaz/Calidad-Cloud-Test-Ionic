@@ -1,21 +1,17 @@
-import {Injectable} from '@angular/core';
+import {Inject, Injectable} from '@angular/core';
 import {CustomList, MAX_CUSTOM_LISTS} from '../entities/custom-list.entity';
-
-export interface ListRepository {
-  getCustomLists(): Promise<CustomList[]>;
-
-  createCustomList(list: Omit<CustomList, 'id' | 'createdAt' | 'updatedAt'>): Promise<string>;
-}
+import {ListRepository} from '../repositories/list.repository';
+import {LIST_REPOSITORY_TOKEN} from '../tokens/list-repository.token';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ManageListsUseCase {
-  constructor(private listRepository: ListRepository) {
+  constructor(@Inject(LIST_REPOSITORY_TOKEN) private listRepository: ListRepository) {
   }
 
   async validateCanCreateList(): Promise<{ canCreate: boolean; reason?: string }> {
-    const existingLists = await this.listRepository.getCustomLists();
+    const existingLists = await this.listRepository.getAll();
 
     if (existingLists.length >= MAX_CUSTOM_LISTS) {
       return {
@@ -28,7 +24,7 @@ export class ManageListsUseCase {
   }
 
   async createListIfAllowed(
-    listData: Omit<CustomList, 'id' | 'createdAt' | 'updatedAt'>
+    listData: { name: string; description?: string }
   ): Promise<{ success: boolean; listId?: string; error?: string }> {
     // Validate name
     if (!listData.name || listData.name.trim().length === 0) {
@@ -48,10 +44,12 @@ export class ManageListsUseCase {
     }
 
     try {
-      const listId = await this.listRepository.createCustomList({
-        ...listData,
-        name: listData.name.trim()
+      const createdList = await this.listRepository.create({
+        name: listData.name.trim(),
+        description: listData.description,
+        bookIds: []
       });
+      const listId = createdList.id;
 
       return {
         success: true,
@@ -70,7 +68,15 @@ export class ManageListsUseCase {
     canCreateMore: boolean;
     remainingSlots: number;
   }> {
-    const lists = await this.listRepository.getCustomLists();
+    const entities = await this.listRepository.getAll();
+    const lists: CustomList[] = entities.map(entity => ({
+      id: entity.id,
+      name: entity.name,
+      description: entity.description,
+      bookCount: entity.bookIds.length,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt
+    }));
     const canCreateMore = lists.length < MAX_CUSTOM_LISTS;
     const remainingSlots = MAX_CUSTOM_LISTS - lists.length;
 

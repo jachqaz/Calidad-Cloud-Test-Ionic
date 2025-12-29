@@ -69,7 +69,7 @@ describe('StorageService', () => {
 
       // Retrieve books by genre
       const books = await service.getBooksByGenre('fiction');
-      expect(books).toHaveLength(1);
+      expect(books).toHaveSize(1);
       expect(books[0].title).toBe('Test Book');
       expect(sqliteSpy.executeQuery).toHaveBeenCalledWith(
         'SELECT * FROM cached_books WHERE genre = ? ORDER BY title',
@@ -91,7 +91,7 @@ describe('StorageService', () => {
       }));
 
       const books = await service.searchBooks('Test');
-      expect(books).toHaveLength(1);
+      expect(books).toHaveSize(1);
       expect(sqliteSpy.executeQuery).toHaveBeenCalledWith(
         'SELECT * FROM cached_books WHERE title LIKE ? OR authors LIKE ? ORDER BY title',
         ['%Test%', '%Test%']
@@ -116,7 +116,7 @@ describe('StorageService', () => {
       );
 
       const savedGenres = await service.getSelectedGenres();
-      expect(savedGenres).toHaveLength(1);
+      expect(savedGenres).toHaveSize(1);
       expect(savedGenres[0].name).toBe('Fiction');
     });
   });
@@ -164,7 +164,7 @@ describe('StorageService', () => {
       }));
 
       const books = await service.getBooksInList('list-1');
-      expect(books).toHaveLength(1);
+      expect(books).toHaveSize(1);
       expect(sqliteSpy.executeQuery).toHaveBeenCalledWith(
         jasmine.stringContaining('SELECT cb.* FROM cached_books cb'),
         ['list-1']

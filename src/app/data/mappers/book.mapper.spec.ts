@@ -20,7 +20,7 @@ describe('BookMapper', () => {
       expect(book.id).toBe('OL123W');
       expect(book.key).toBe('/works/OL123W');
       expect(book.title).toBe('Test Book');
-      expect(book.authors).toHaveLength(1);
+      expect(book.authors).toHaveSize(1);
       expect(book.authors[0].name).toBe('Test Author');
       expect(book.coverId).toBe(12345);
       expect(book.coverUrl).toBe('https://covers.openlibrary.org/b/id/12345-M.jpg');
@@ -70,7 +70,7 @@ describe('BookMapper', () => {
 
       expect(book.id).toBe('OL789W');
       expect(book.title).toBe('Search Result Book');
-      expect(book.authors).toHaveLength(2);
+      expect(book.authors).toHaveSize(2);
       expect(book.authors[0].name).toBe('Author One');
       expect(book.authors[1].name).toBe('Author Two');
       expect(book.coverId).toBe(67890);
@@ -103,7 +103,7 @@ describe('BookMapper', () => {
 
       const book = BookMapper.fromOpenLibrarySearchDoc(doc);
 
-      expect(book.authors).toHaveLength(2);
+      expect(book.authors).toHaveSize(2);
       expect(book.authors[0].key).toBe('/authors/OL111A');
       expect(book.authors[1].key).toBe(''); // Missing key defaults to empty
     });

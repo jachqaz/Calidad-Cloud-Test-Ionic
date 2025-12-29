@@ -1,6 +1,8 @@
 import {TestBed} from '@angular/core/testing';
-import {ListRepository, ManageListsUseCase} from './manage-lists.use-case';
+import {ManageListsUseCase} from './manage-lists.use-case';
+import {ListRepository} from '../repositories/list.repository';
 import {CustomList, MAX_CUSTOM_LISTS} from '../entities/custom-list.entity';
+import {LIST_REPOSITORY_TOKEN} from '../tokens/list-repository.token';
 
 describe('ManageListsUseCase', () => {
   let useCase: ManageListsUseCase;
@@ -16,17 +18,17 @@ describe('ManageListsUseCase', () => {
   };
 
   beforeEach(() => {
-    const repositorySpy = jasmine.createSpyObj('ListRepository', ['getCustomLists', 'createCustomList']);
+    const repositorySpy = jasmine.createSpyObj('ListRepository', ['getAll', 'create']);
 
     TestBed.configureTestingModule({
       providers: [
         ManageListsUseCase,
-        {provide: ListRepository, useValue: repositorySpy}
+        {provide: LIST_REPOSITORY_TOKEN, useValue: repositorySpy}
       ]
     });
 
     useCase = TestBed.inject(ManageListsUseCase);
-    mockRepository = TestBed.inject(ListRepository) as jasmine.SpyObj<ListRepository>;
+    mockRepository = TestBed.inject(LIST_REPOSITORY_TOKEN) as unknown as jasmine.SpyObj<ListRepository>;
   });
 
   it('should be created', () => {
@@ -35,7 +37,10 @@ describe('ManageListsUseCase', () => {
 
   describe('validateCanCreateList', () => {
     it('should allow creation when under limit', async () => {
-      mockRepository.getCustomLists.and.returnValue(Promise.resolve([mockList]));
+      mockRepository.getAll.and.returnValue(Promise.resolve([{
+        ...mockList,
+        bookIds: []
+      }]));
 
       const result = await useCase.validateCanCreateList();
 
@@ -47,10 +52,11 @@ describe('ManageListsUseCase', () => {
       const maxLists = Array(MAX_CUSTOM_LISTS).fill(0).map((_, i) => ({
         ...mockList,
         id: `list-${i}`,
-        name: `List ${i}`
+        name: `List ${i}`,
+        bookIds: []
       }));
 
-      mockRepository.getCustomLists.and.returnValue(Promise.resolve(maxLists));
+      mockRepository.getAll.and.returnValue(Promise.resolve(maxLists));
 
       const result = await useCase.validateCanCreateList();
 
@@ -63,8 +69,7 @@ describe('ManageListsUseCase', () => {
     it('should reject empty name', async () => {
       const result = await useCase.createListIfAllowed({
         name: '',
-        description: 'Test',
-        bookCount: 0
+        description: 'Test'
       });
 
       expect(result.success).toBe(false);
@@ -74,8 +79,7 @@ describe('ManageListsUseCase', () => {
     it('should reject whitespace-only name', async () => {
       const result = await useCase.createListIfAllowed({
         name: '   ',
-        description: 'Test',
-        bookCount: 0
+        description: 'Test'
       });
 
       expect(result.success).toBe(false);
@@ -86,15 +90,15 @@ describe('ManageListsUseCase', () => {
       const maxLists = Array(MAX_CUSTOM_LISTS).fill(0).map((_, i) => ({
         ...mockList,
         id: `list-${i}`,
-        name: `List ${i}`
+        name: `List ${i}`,
+        bookIds: []
       }));
 
-      mockRepository.getCustomLists.and.returnValue(Promise.resolve(maxLists));
+      mockRepository.getAll.and.returnValue(Promise.resolve(maxLists));
 
       const result = await useCase.createListIfAllowed({
         name: 'New List',
-        description: 'Test',
-        bookCount: 0
+        description: 'Test'
       });
 
       expect(result.success).toBe(false);
@@ -102,49 +106,63 @@ describe('ManageListsUseCase', () => {
     });
 
     it('should create list when valid and under limit', async () => {
-      mockRepository.getCustomLists.and.returnValue(Promise.resolve([mockList]));
-      mockRepository.createCustomList.and.returnValue(Promise.resolve('new-list-id'));
+      mockRepository.getAll.and.returnValue(Promise.resolve([{
+        ...mockList,
+        bookIds: []
+      }]));
+      mockRepository.create.and.returnValue(Promise.resolve({
+        id: 'new-list-id',
+        name: 'New List',
+        description: 'Test Description',
+        bookIds: [],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }));
 
       const result = await useCase.createListIfAllowed({
         name: 'New List',
-        description: 'Test Description',
-        bookCount: 0
+        description: 'Test Description'
       });
 
       expect(result.success).toBe(true);
       expect(result.listId).toBe('new-list-id');
-      expect(mockRepository.createCustomList).toHaveBeenCalledWith({
+      expect(mockRepository.create).toHaveBeenCalledWith({
         name: 'New List',
         description: 'Test Description',
-        bookCount: 0
+        bookIds: []
       });
     });
 
     it('should trim whitespace from name', async () => {
-      mockRepository.getCustomLists.and.returnValue(Promise.resolve([]));
-      mockRepository.createCustomList.and.returnValue(Promise.resolve('new-list-id'));
+      mockRepository.getAll.and.returnValue(Promise.resolve([]));
+      mockRepository.create.and.returnValue(Promise.resolve({
+        id: 'new-list-id',
+        name: 'Trimmed Name',
+        description: 'Test',
+        bookIds: [],
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }));
 
       await useCase.createListIfAllowed({
         name: '  Trimmed Name  ',
-        description: 'Test',
-        bookCount: 0
+        description: 'Test'
       });
 
-      expect(mockRepository.createCustomList).toHaveBeenCalledWith({
+      expect(mockRepository.create).toHaveBeenCalledWith({
         name: 'Trimmed Name',
         description: 'Test',
-        bookCount: 0
+        bookIds: []
       });
     });
 
     it('should handle repository errors', async () => {
-      mockRepository.getCustomLists.and.returnValue(Promise.resolve([]));
-      mockRepository.createCustomList.and.returnValue(Promise.reject(new Error('DB Error')));
+      mockRepository.getAll.and.returnValue(Promise.resolve([]));
+      mockRepository.create.and.returnValue(Promise.reject(new Error('DB Error')));
 
       const result = await useCase.createListIfAllowed({
         name: 'Test List',
-        description: 'Test',
-        bookCount: 0
+        description: 'Test'
       });
 
       expect(result.success).toBe(false);
@@ -154,11 +172,14 @@ describe('ManageListsUseCase', () => {
 
   describe('getListsWithAvailability', () => {
     it('should return availability info when under limit', async () => {
-      mockRepository.getCustomLists.and.returnValue(Promise.resolve([mockList]));
+      mockRepository.getAll.and.returnValue(Promise.resolve([{
+        ...mockList,
+        bookIds: []
+      }]));
 
       const result = await useCase.getListsWithAvailability();
 
-      expect(result.lists).toHaveLength(1);
+      expect(result.lists).toHaveSize(1);
       expect(result.canCreateMore).toBe(true);
       expect(result.remainingSlots).toBe(MAX_CUSTOM_LISTS - 1);
     });
@@ -167,14 +188,15 @@ describe('ManageListsUseCase', () => {
       const maxLists = Array(MAX_CUSTOM_LISTS).fill(0).map((_, i) => ({
         ...mockList,
         id: `list-${i}`,
-        name: `List ${i}`
+        name: `List ${i}`,
+        bookIds: []
       }));
 
-      mockRepository.getCustomLists.and.returnValue(Promise.resolve(maxLists));
+      mockRepository.getAll.and.returnValue(Promise.resolve(maxLists));
 
       const result = await useCase.getListsWithAvailability();
 
-      expect(result.lists).toHaveLength(MAX_CUSTOM_LISTS);
+      expect(result.lists).toHaveSize(MAX_CUSTOM_LISTS);
       expect(result.canCreateMore).toBe(false);
       expect(result.remainingSlots).toBe(0);
     });
