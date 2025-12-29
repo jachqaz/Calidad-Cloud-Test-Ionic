@@ -1,4 +1,4 @@
-import {Component, Input, signal} from '@angular/core';
+import {Component, Input, OnInit, signal} from '@angular/core';
 import {IonicModule, ModalController} from '@ionic/angular';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
@@ -12,7 +12,7 @@ import {CustomListEntity, MAX_CUSTOM_LISTS} from '../../../domain/models';
   templateUrl: './create-list-modal.component.html',
   styleUrls: ['./create-list-modal.component.scss']
 })
-export class CreateListModalComponent {
+export class CreateListModalComponent implements OnInit {
   @Input() list?: CustomListEntity; // Para modo edición
 
   listName = '';

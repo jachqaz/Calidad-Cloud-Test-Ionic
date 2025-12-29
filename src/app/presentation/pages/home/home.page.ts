@@ -43,7 +43,7 @@ export class HomePage implements OnInit {
   }
 
   async ngOnInit() {
-    // Don't load genres on init, wait for ionViewDidEnter
+    await this.loadSelectedGenres();
   }
 
   async ionViewWillEnter() {
