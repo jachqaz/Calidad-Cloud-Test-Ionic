@@ -48,7 +48,7 @@ export class ListStateService {
       const newList = await this.listRepository.create({
         name: name.trim(),
         description: description?.trim(),
-        bookIds: []
+        bookCount: 0
       });
 
       this._lists.update(lists => [...lists, newList]);
@@ -66,18 +66,11 @@ export class ListStateService {
       return;
     }
 
-    if (list.bookIds.includes(bookId)) {
-      this.setError('Book already in list');
-      return;
-    }
-
     this.setLoading(true);
     this.clearError();
 
     try {
-      const updatedBookIds = [...list.bookIds, bookId];
-      const updatedList = await this.listRepository.update(listId, {bookIds: updatedBookIds});
-
+      const updatedList = await this.listRepository.update(listId, {bookCount: list.bookCount + 1});
       this._lists.update(lists =>
         lists.map(l => l.id === listId ? updatedList : l)
       );
@@ -99,9 +92,7 @@ export class ListStateService {
     this.clearError();
 
     try {
-      const updatedBookIds = list.bookIds.filter(id => id !== bookId);
-      const updatedList = await this.listRepository.update(listId, {bookIds: updatedBookIds});
-
+      const updatedList = await this.listRepository.update(listId, {bookCount: Math.max(0, list.bookCount - 1)});
       this._lists.update(lists =>
         lists.map(l => l.id === listId ? updatedList : l)
       );

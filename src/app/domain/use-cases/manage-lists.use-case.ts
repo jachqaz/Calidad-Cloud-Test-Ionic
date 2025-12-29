@@ -1,7 +1,9 @@
 import {Inject, Injectable} from '@angular/core';
-import {CustomList, MAX_CUSTOM_LISTS} from '../entities/custom-list.entity';
+import {CustomListEntity} from '../models/custom-list.entity';
 import {ListRepository} from '../repositories/list.repository';
 import {LIST_REPOSITORY_TOKEN} from '../tokens/list-repository.token';
+
+const MAX_CUSTOM_LISTS = 3;
 
 @Injectable({
   providedIn: 'root'
@@ -47,7 +49,7 @@ export class ManageListsUseCase {
       const createdList = await this.listRepository.create({
         name: listData.name.trim(),
         description: listData.description,
-        bookIds: []
+        bookCount: 0
       });
       const listId = createdList.id;
 
@@ -64,19 +66,11 @@ export class ManageListsUseCase {
   }
 
   async getListsWithAvailability(): Promise<{
-    lists: CustomList[];
+    lists: CustomListEntity[];
     canCreateMore: boolean;
     remainingSlots: number;
   }> {
-    const entities = await this.listRepository.getAll();
-    const lists: CustomList[] = entities.map(entity => ({
-      id: entity.id,
-      name: entity.name,
-      description: entity.description,
-      bookCount: entity.bookIds.length,
-      createdAt: entity.createdAt,
-      updatedAt: entity.updatedAt
-    }));
+    const lists = await this.listRepository.getAll();
     const canCreateMore = lists.length < MAX_CUSTOM_LISTS;
     const remainingSlots = MAX_CUSTOM_LISTS - lists.length;
 

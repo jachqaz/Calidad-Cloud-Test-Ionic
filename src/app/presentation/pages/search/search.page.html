@@ -1,0 +1,91 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Search Books</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="clearSearch()">
+        <ion-icon name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="search-content">
+  <div class="container">
+    <div class="search-section">
+      <ion-searchbar
+        (ionClear)="clearSearch()"
+        (ionInput)="onSearchInput($event)"
+        [(ngModel)]="searchQuery"
+        debounce="500"
+        placeholder="Search by title, author or ISBN">
+      </ion-searchbar>
+    </div>
+
+    <!-- Loading State -->
+    @if (libraryFacade.bookState.isLoading() && libraryFacade.bookState.books().length === 0) {
+      <div class="loading-state">
+        <ion-spinner></ion-spinner>
+        <p>Searching books...</p>
+      </div>
+    }
+
+    <!-- Empty State -->
+    @if (!libraryFacade.bookState.isLoading() && !libraryFacade.bookState.hasBooks() && searchQuery.length > 0) {
+      <div class="empty-state">
+        <ion-icon name="search-outline" size="large"></ion-icon>
+        <h3>No results</h3>
+        <p>No books found for "{{ searchQuery }}"</p>
+      </div>
+    }
+
+    <!-- Initial State -->
+    @if (searchQuery.length === 0) {
+      <div class="initial-state">
+        <ion-icon name="search-outline" size="large"></ion-icon>
+        <h2>Search Books</h2>
+        <p>Enter the title, author or ISBN of the book you're looking for</p>
+      </div>
+    }
+
+    <!-- Results -->
+    @if (libraryFacade.bookState.hasBooks()) {
+      <div class="books-grid">
+        @for (book of libraryFacade.bookState.books(); track book.id) {
+          <ion-card (click)="openBookDetail(book)" class="book-card">
+            <img
+              [alt]="book.title"
+              [src]="book.coverUrl || 'assets/book-placeholder.png'"
+              class="book-cover">
+            <ion-card-content>
+              <h3>{{ book.title }}</h3>
+              <p>{{ book.author }}</p>
+              <ion-badge color="primary">{{ book.genre }}</ion-badge>
+            </ion-card-content>
+          </ion-card>
+        }
+      </div>
+
+      <ion-infinite-scroll
+        (ionInfinite)="loadMore($event)"
+        [disabled]="!canLoadMore()">
+        <ion-infinite-scroll-content
+          loadingSpinner="bubbles"
+          loadingText="Loading more results...">
+        </ion-infinite-scroll-content>
+      </ion-infinite-scroll>
+    }
+
+    <!-- Error State -->
+    @if (libraryFacade.bookState.hasError()) {
+      <div class="error-state">
+        <ion-icon class="error-icon" name="alert-circle-outline"></ion-icon>
+        <h3>Something went wrong</h3>
+        <p>{{ libraryFacade.bookState.errorMessage() }}</p>
+        <ion-button (click)="retry()" fill="outline">Try Again</ion-button>
+      </div>
+    }
+  </div>
+</ion-content>

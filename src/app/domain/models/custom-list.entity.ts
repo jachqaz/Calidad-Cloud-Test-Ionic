@@ -2,7 +2,9 @@ export interface CustomListEntity {
   id: string;
   name: string;
   description?: string;
-  bookIds: string[];
-  createdAt: Date;
-  updatedAt: Date;
+  bookCount: number;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
+
+export const MAX_CUSTOM_LISTS = 3;

@@ -1,0 +1,100 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ selectedGenreTitle() || 'Books' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="openSearch()">
+        <ion-icon name="search-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="books-content">
+  <div class="container">
+    <!-- Genre Categories -->
+    <div class="genres-section">
+      <h2>Explore Genres</h2>
+      <div class="genres-grid">
+        @for (genre of genres(); track genre.key) {
+          <ion-card
+            (click)="loadGenre(genre.key)"
+            [class.active]="selectedGenre() === genre.key"
+            class="genre-card">
+            <ion-card-content>
+              <ion-icon [name]="genre.icon" class="genre-icon"></ion-icon>
+              <h3>{{ genre.name }}</h3>
+              <p>{{ genre.description }}</p>
+            </ion-card-content>
+          </ion-card>
+        }
+      </div>
+    </div>
+
+    <!-- Books List -->
+    <div *ngIf="libraryFacade.bookState.hasBooks() || libraryFacade.bookState.isLoading()" class="books-section">
+      <h2>{{ selectedGenreTitle() }}</h2>
+
+      <!-- Loading Skeletons -->
+      <div *ngIf="libraryFacade.bookState.isLoading()" class="books-grid">
+        @for (item of skeletonItems; track $index) {
+          <ion-card>
+            <ion-skeleton-text animated style="height: 200px;"></ion-skeleton-text>
+            <ion-card-content>
+              <ion-skeleton-text animated style="width: 80%;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 60%;"></ion-skeleton-text>
+            </ion-card-content>
+          </ion-card>
+        }
+      </div>
+
+      <!-- Books Grid -->
+      <div *ngIf="!libraryFacade.bookState.isLoading() && libraryFacade.bookState.hasBooks()" class="books-grid">
+        @for (book of libraryFacade.bookState.books(); track book.id) {
+          <ion-card
+            (click)="openBookDetail(book)"
+            class="book-card">
+            <img
+              [alt]="book.title"
+              [src]="book.coverUrl || 'assets/book-placeholder.png'"
+              class="book-cover">
+            <ion-card-content>
+              <h3>{{ book.title }}</h3>
+              <p>{{ book.author }}</p>
+              <ion-badge color="primary">{{ book.genre }}</ion-badge>
+            </ion-card-content>
+          </ion-card>
+        }
+      </div>
+
+      <!-- No Books Message -->
+      <div *ngIf="!libraryFacade.bookState.isLoading() && !libraryFacade.bookState.hasBooks() && selectedGenre()"
+           class="no-books">
+        <ion-icon name="library-outline" size="large"></ion-icon>
+        <h3>No books found</h3>
+        <p>No books available for {{ selectedGenreTitle() }}</p>
+      </div>
+
+      <!-- Infinite Scroll -->
+      <ion-infinite-scroll
+        (ionInfinite)="loadMore($event)"
+        *ngIf="libraryFacade.bookState.hasBooks()"
+        [disabled]="!canLoadMore()">
+        <ion-infinite-scroll-content
+          loadingSpinner="bubbles"
+          loadingText="Loading more books...">
+        </ion-infinite-scroll-content>
+      </ion-infinite-scroll>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="libraryFacade.bookState.hasError()" class="error-state">
+      <ion-icon class="error-icon" name="alert-circle-outline"></ion-icon>
+      <h3>Something went wrong</h3>
+      <p>{{ libraryFacade.bookState.errorMessage() }}</p>
+      <ion-button (click)="retry()" fill="outline">Try Again</ion-button>
+    </div>
+  </div>
+</ion-content>

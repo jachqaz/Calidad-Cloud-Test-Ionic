@@ -1,0 +1,76 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>Book Detail</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="book-detail-content">
+  <div class="container">
+    @if (libraryFacade.bookState.isLoading()) {
+      <div class="loading-state">
+        <ion-spinner></ion-spinner>
+        <p>Loading details...</p>
+      </div>
+    }
+
+    @if (libraryFacade.bookState.hasError()) {
+      <div class="error-state">
+        <ion-icon name="alert-circle-outline" size="large"></ion-icon>
+        <h3>Error loading</h3>
+        <p>Could not get book information</p>
+        <ion-button (click)="retry()" fill="outline">Try Again</ion-button>
+      </div>
+    }
+
+    @if (selectedBook()) {
+      <div class="book-detail">
+        @if (selectedBook()?.coverUrl) {
+          <div class="cover-container">
+            <img [alt]="selectedBook()?.title" [src]="selectedBook()?.coverUrl"/>
+          </div>
+        }
+
+        <div class="book-info">
+          <h1>{{ selectedBook()?.title }}</h1>
+
+          @if (selectedBook()?.author) {
+            <div class="author">
+              <ion-icon name="person-outline"></ion-icon>
+              <span>{{ selectedBook()?.author }}</span>
+            </div>
+          }
+
+          @if (selectedBook()?.publishedYear) {
+            <div class="year">
+              <ion-icon name="calendar-outline"></ion-icon>
+              <span>{{ selectedBook()?.publishedYear }}</span>
+            </div>
+          }
+
+          @if (selectedBook()?.genre) {
+            <div class="genre">
+              <ion-icon name="library-outline"></ion-icon>
+              <span>{{ selectedBook()?.genre }}</span>
+            </div>
+          }
+
+          @if (selectedBook()?.description) {
+            <div class="description">
+              <h3>Description</h3>
+              <p>{{ selectedBook()?.description }}</p>
+            </div>
+          }
+        </div>
+      </div>
+
+      <ion-fab horizontal="end" slot="fixed" vertical="bottom">
+        <ion-fab-button (click)="openAddToListModal()">
+          <ion-icon name="bookmark-outline"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+    }
+  </div>
+</ion-content>

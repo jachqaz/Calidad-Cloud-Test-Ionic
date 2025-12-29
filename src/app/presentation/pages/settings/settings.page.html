@@ -1,0 +1,36 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Settings</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="settings-content">
+  <div class="container">
+    <ion-list>
+      <ion-item (click)="openGenreSelection()" button>
+        <ion-icon name="library-outline" slot="start"></ion-icon>
+        <ion-label>
+          <h2>Change Genres</h2>
+          <p>Select your 4 favorite genres</p>
+        </ion-label>
+        <ion-icon name="chevron-forward" slot="end"></ion-icon>
+      </ion-item>
+    </ion-list>
+
+    @if (currentGenres().length > 0) {
+      <div class="current-genres">
+        <h3>Current Genres:</h3>
+        <div class="genre-chips">
+          @for (genre of currentGenres(); track genre.id) {
+            <ion-chip color="primary">
+              <ion-label>{{ genre.name }}</ion-label>
+            </ion-chip>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</ion-content>

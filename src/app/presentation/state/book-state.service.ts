@@ -72,6 +72,29 @@ export class BookStateService {
     this._selectedBook.set(book);
   }
 
+  async loadBookDetail(bookId: string): Promise<void> {
+    this.setLoading(true);
+    this.clearError();
+
+    try {
+      const book = await this.bookRepository.getById(bookId);
+      if (book) {
+        this._selectedBook.set(book);
+      } else {
+        this.setError('Book not found');
+      }
+    } catch (error) {
+      this.setError('Failed to load book details');
+    } finally {
+      this.setLoading(false);
+    }
+  }
+
+  async loadMoreBooks(): Promise<void> {
+    // Implementation for pagination - for now just a placeholder
+    // In a real app, this would load the next page of results
+  }
+
   clearBooks(): void {
     this._books.set([]);
   }

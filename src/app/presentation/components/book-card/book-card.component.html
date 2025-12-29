@@ -1,0 +1,18 @@
+<ion-card (click)="onBookClick()" class="book-card">
+  <img
+    [alt]="book.title"
+    [src]="book.coverUrl || 'assets/book-placeholder.png'"
+    class="book-cover"
+    loading="lazy">
+  <ion-card-content>
+    <h3>{{ book.title }}</h3>
+    <p class="author">{{ book.author }}</p>
+    <div class="book-meta">
+      <ion-badge color="primary">{{ book.genre }}</ion-badge>
+      <span *ngIf="book.rating" class="rating">
+        <ion-icon color="warning" name="star"></ion-icon>
+        {{ book.rating | number:'1.1-1' }}
+      </span>
+    </div>
+  </ion-card-content>
+</ion-card>

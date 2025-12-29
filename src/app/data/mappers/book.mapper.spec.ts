@@ -18,16 +18,11 @@ describe('BookMapper', () => {
       const book = BookMapper.fromOpenLibraryWork(work, 'fiction');
 
       expect(book.id).toBe('OL123W');
-      expect(book.key).toBe('/works/OL123W');
       expect(book.title).toBe('Test Book');
-      expect(book.authors).toHaveSize(1);
-      expect(book.authors[0].name).toBe('Test Author');
-      expect(book.coverId).toBe(12345);
+      expect(book.author).toBe('Test Author');
       expect(book.coverUrl).toBe('https://covers.openlibrary.org/b/id/12345-M.jpg');
-      expect(book.firstPublishYear).toBe(2020);
-      expect(book.subjects).toEqual(['Fiction', 'Adventure']);
+      expect(book.publishedYear).toBe(2020);
       expect(book.genre).toBe('fiction');
-      expect(book.editionCount).toBe(5);
     });
 
     it('should handle missing optional fields', () => {
@@ -40,11 +35,9 @@ describe('BookMapper', () => {
 
       expect(book.id).toBe('OL123W');
       expect(book.title).toBe('Minimal Book');
-      expect(book.authors).toEqual([]);
-      expect(book.coverId).toBeUndefined();
+      expect(book.author).toBe('Unknown Author');
       expect(book.coverUrl).toBeUndefined();
-      expect(book.subjects).toBeUndefined();
-      expect(book.genre).toBeUndefined();
+      expect(book.genre).toBe('Unknown');
     });
   });
 
@@ -70,15 +63,10 @@ describe('BookMapper', () => {
 
       expect(book.id).toBe('OL789W');
       expect(book.title).toBe('Search Result Book');
-      expect(book.authors).toHaveSize(2);
-      expect(book.authors[0].name).toBe('Author One');
-      expect(book.authors[1].name).toBe('Author Two');
-      expect(book.coverId).toBe(67890);
+      expect(book.author).toBe('Author One');
+      expect(book.coverUrl).toBe('https://covers.openlibrary.org/b/id/67890-M.jpg');
       expect(book.isbn).toBe('1234567890');
-      expect(book.language).toEqual(['eng', 'spa']);
-      expect(book.publisher).toBe('Test Publisher');
-      expect(book.publishDate).toBe('2021-01-01');
-      expect(book.pages).toBe(250);
+      expect(book.publishedYear).toBe(2021);
       expect(book.genre).toBe('science');
     });
 
@@ -90,22 +78,7 @@ describe('BookMapper', () => {
 
       const book = BookMapper.fromOpenLibrarySearchDoc(doc);
 
-      expect(book.authors).toEqual([]);
-    });
-
-    it('should handle mismatched author arrays', () => {
-      const doc: OpenLibrarySearchDoc = {
-        key: '/works/OL888W',
-        title: 'Mismatched Authors',
-        author_name: ['Author One', 'Author Two'],
-        author_key: ['/authors/OL111A'] // Only one key for two names
-      };
-
-      const book = BookMapper.fromOpenLibrarySearchDoc(doc);
-
-      expect(book.authors).toHaveSize(2);
-      expect(book.authors[0].key).toBe('/authors/OL111A');
-      expect(book.authors[1].key).toBe(''); // Missing key defaults to empty
+      expect(book.author).toBe('Unknown Author');
     });
   });
 

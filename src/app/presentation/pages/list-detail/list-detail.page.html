@@ -1,0 +1,66 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/my-books"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ listName }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="list-detail-content">
+  <div class="container">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <ion-spinner></ion-spinner>
+        <p>Loading books...</p>
+      </div>
+    }
+
+    @if (!isLoading() && books().length === 0) {
+      <div class="empty-state">
+        <ion-icon name="library-outline" size="large"></ion-icon>
+        <h2>Empty list</h2>
+        <p>You haven't added books to this list yet</p>
+        <p>Search for books and add them using the "Add to list" button</p>
+      </div>
+    }
+
+    @if (books().length > 0) {
+      <ion-list>
+        @for (book of books(); track book.id) {
+          <ion-item-sliding>
+            <ion-item (click)="openBookDetail(book)" button>
+              @if (book.coverUrl) {
+                <ion-thumbnail slot="start">
+                  <img [alt]="book.title" [src]="book.coverUrl"/>
+                </ion-thumbnail>
+              }
+              <ion-label>
+                <h2>{{ book.title }}</h2>
+                <p>{{ book.author }}</p>
+                @if (book.publishedYear) {
+                  <p>{{ book.publishedYear }}</p>
+                }
+              </ion-label>
+            </ion-item>
+
+            <ion-item-options side="end">
+              <ion-item-option
+                (click)="removeBook(book)"
+                color="danger">
+                <ion-icon name="trash-outline"></ion-icon>
+                Remove
+              </ion-item-option>
+            </ion-item-options>
+          </ion-item-sliding>
+        }
+      </ion-list>
+
+      <div class="book-count">
+        <ion-note>
+          {{ books().length }} {{ books().length === 1 ? 'book' : 'books' }} in this list
+        </ion-note>
+      </div>
+    }
+  </div>
+</ion-content>

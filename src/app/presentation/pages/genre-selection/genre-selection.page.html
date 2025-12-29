@@ -1,0 +1,36 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Select 4 Genres</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="genre-selection-content">
+  <div class="container">
+    <div class="genre-grid">
+      @for (genre of availableGenres; track genre.id) {
+        <ion-card
+          (click)="toggleGenre(genre)"
+          [class.selected]="isSelected(genre.id)">
+          <ion-card-content>
+            <h3>{{ genre.name }}</h3>
+            <ion-icon
+              [color]="isSelected(genre.id) ? 'primary' : 'medium'"
+              [name]="isSelected(genre.id) ? 'checkmark-circle' : 'ellipse-outline'">
+            </ion-icon>
+          </ion-card-content>
+        </ion-card>
+      }
+    </div>
+
+    <div class="selection-info">
+      <p>{{ selectedCount() }}/4 genres selected</p>
+    </div>
+
+    <ion-button
+      (click)="saveAndContinue()"
+      [disabled]="!canContinue()"
+      expand="block">
+      Continue
+    </ion-button>
+  </div>
+</ion-content>

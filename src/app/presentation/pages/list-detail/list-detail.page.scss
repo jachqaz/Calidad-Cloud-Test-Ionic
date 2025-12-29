@@ -1,0 +1,40 @@
+.list-detail-content {
+  .container {
+    padding: 16px;
+  }
+
+  .loading-state,
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50vh;
+    text-align: center;
+    padding: 20px;
+    color: var(--ion-color-medium);
+
+    ion-icon {
+      margin-bottom: 16px;
+    }
+
+    h2 {
+      margin: 16px 0 8px 0;
+    }
+
+    p {
+      margin-bottom: 8px;
+    }
+  }
+
+  .book-count {
+    padding: 16px;
+    text-align: center;
+  }
+
+  ion-thumbnail img {
+    width: 60px;
+    height: 80px;
+    object-fit: cover;
+  }
+}

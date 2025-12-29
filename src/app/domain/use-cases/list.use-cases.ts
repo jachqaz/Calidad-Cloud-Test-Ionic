@@ -22,7 +22,7 @@ export class CreateCustomListUseCase {
     return this.listRepository.create({
       name: name.trim(),
       description: description?.trim(),
-      bookIds: []
+      bookCount: 0
     });
   }
 }
@@ -41,11 +41,11 @@ export class AddBookToListUseCase {
       throw new Error('List not found');
     }
 
-    if (list.bookIds.includes(bookId)) {
-      throw new Error('Book is already in the list');
-    }
+    // Update the book count
+    const updatedList = await this.listRepository.update(listId, {
+      bookCount: list.bookCount + 1
+    });
 
-    const updatedBookIds = [...list.bookIds, bookId];
-    return this.listRepository.update(listId, {bookIds: updatedBookIds});
+    return updatedList;
   }
 }

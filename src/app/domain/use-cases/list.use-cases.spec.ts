@@ -20,7 +20,7 @@ describe('List Use Cases', () => {
       const mockList: CustomListEntity = {
         id: '1',
         name: 'Valid List',
-        bookIds: [],
+        bookCount: 0,
         createdAt: new Date(),
         updatedAt: new Date()
       };
@@ -34,7 +34,7 @@ describe('List Use Cases', () => {
       expect(mockRepository.create).toHaveBeenCalledWith({
         name: 'Valid List',
         description: undefined,
-        bookIds: []
+        bookCount: 0
       });
     });
 
@@ -63,7 +63,7 @@ describe('List Use Cases', () => {
       expect(mockRepository.create).toHaveBeenCalledWith({
         name: 'Trimmed Name',
         description: 'Trimmed Description',
-        bookIds: []
+        bookCount: 0
       });
     });
   });
@@ -79,14 +79,14 @@ describe('List Use Cases', () => {
       const mockList: CustomListEntity = {
         id: '1',
         name: 'Test List',
-        bookIds: ['book1'],
+        bookCount: 1,
         createdAt: new Date(),
         updatedAt: new Date()
       };
 
       const updatedList: CustomListEntity = {
         ...mockList,
-        bookIds: ['book1', 'book2']
+        bookCount: 2
       };
 
       mockRepository.getById.and.returnValue(Promise.resolve(mockList));
@@ -94,8 +94,8 @@ describe('List Use Cases', () => {
 
       const result = await useCase.execute('1', 'book2');
 
-      expect(mockRepository.update).toHaveBeenCalledWith('1', {bookIds: ['book1', 'book2']});
-      expect(result.bookIds).toContain('book2');
+      expect(mockRepository.update).toHaveBeenCalledWith('1', {bookCount: 2});
+      expect(result.bookCount).toBe(2);
     });
 
     it('should throw error for missing parameters', async () => {
@@ -107,20 +107,6 @@ describe('List Use Cases', () => {
       mockRepository.getById.and.returnValue(Promise.resolve(null));
 
       await expectAsync(useCase.execute('999', 'book1')).toBeRejectedWithError('List not found');
-    });
-
-    it('should throw error when book already in list', async () => {
-      const mockList: CustomListEntity = {
-        id: '1',
-        name: 'Test List',
-        bookIds: ['book1'],
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-
-      mockRepository.getById.and.returnValue(Promise.resolve(mockList));
-
-      await expectAsync(useCase.execute('1', 'book1')).toBeRejectedWithError('Book is already in the list');
     });
   });
 });

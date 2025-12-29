@@ -1,0 +1,87 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Add to List</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="book-info">
+    <h3>{{ book?.title }}</h3>
+    @if (hasAuthors()) {
+      <p>{{ getFirstAuthorName() }}</p>
+    }
+  </div>
+
+  @if (customLists().length === 0) {
+    <div class="empty-state">
+      <ion-icon name="bookmarks-outline" size="large"></ion-icon>
+      <h3>No lists</h3>
+      <p>Create your first custom list</p>
+    </div>
+  }
+
+  @if (customLists().length > 0) {
+    <ion-list>
+      <ion-list-header>
+        <ion-label>Select a list</ion-label>
+      </ion-list-header>
+
+      @for (list of customLists(); track list.id) {
+        <ion-item (click)="addToList(list)" button>
+          <ion-label>
+            <h2>{{ list.name }}</h2>
+            <p>{{ list.bookCount }} books</p>
+            @if (list.description) {
+              <p>{{ list.description }}</p>
+            }
+          </ion-label>
+          <ion-icon name="add-outline" slot="end"></ion-icon>
+        </ion-item>
+      }
+    </ion-list>
+  }
+
+  @if (customLists().length < MAX_CUSTOM_LISTS) {
+    <div class="create-list-section">
+      <ion-item>
+        <ion-input
+          [(ngModel)]="newListName"
+          maxlength="50"
+          placeholder="New list name">
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-textarea
+          [(ngModel)]="newListDescription"
+          maxlength="200"
+          placeholder="Description (optional)"
+          rows="2">
+        </ion-textarea>
+      </ion-item>
+
+      <div class="create-button-container">
+        <ion-button
+          (click)="createAndAddToList()"
+          [disabled]="!newListName.trim()"
+          expand="block"
+          fill="outline">
+          <ion-icon name="add-outline" slot="start"></ion-icon>
+          Create List and Add
+        </ion-button>
+      </div>
+    </div>
+  }
+
+  @if (customLists().length >= MAX_CUSTOM_LISTS) {
+    <div class="max-lists-info">
+      <ion-note>
+        Maximum {{ MAX_CUSTOM_LISTS }} lists allowed.
+        Delete an existing list to create a new one.
+      </ion-note>
+    </div>
+  }
+</ion-content>

@@ -1,9 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Capacitor} from '@capacitor/core';
 import {SqliteService} from './sqlite.service';
-import {Genre} from '../../domain/entities/genre.entity';
-import {Book} from '../../domain/entities/book.entity';
-import {CustomList} from '../../domain/entities/custom-list.entity';
+import {CategoryEntity, BookEntity, CustomListEntity} from '../../domain/models';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +11,7 @@ export class StorageService {
   }
 
   // Genre operations
-  async saveSelectedGenres(genres: Genre[]): Promise<void> {
+  async saveSelectedGenres(genres: CategoryEntity[]): Promise<void> {
     try {
       // For web development, also save to localStorage as fallback
       if (!Capacitor.isNativePlatform()) {
@@ -34,7 +32,7 @@ export class StorageService {
     }
   }
 
-  async getSelectedGenres(): Promise<Genre[]> {
+  async getSelectedGenres(): Promise<CategoryEntity[]> {
     try {
       const result = await this.sqlite.executeQuery('SELECT * FROM selected_genres ORDER BY name');
 
@@ -63,38 +61,27 @@ export class StorageService {
   }
 
   // Book operations
-  async saveBook(book: Book): Promise<void> {
+  async saveBook(book: BookEntity): Promise<void> {
     const query = `
       INSERT OR REPLACE INTO cached_books
-      (id, key, title, authors, cover_id, cover_url, first_publish_year,
-       subjects, genre, description, edition_count, isbn, language,
-       publish_date, publisher, pages, rating, availability, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      (id, title, author, genre, isbn, published_year, description, cover_url, rating, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     `;
 
     await this.sqlite.executeRun(query, [
       book.id,
-      book.key,
       book.title,
-      JSON.stringify(book.authors),
-      book.coverId,
-      book.coverUrl,
-      book.firstPublishYear,
-      JSON.stringify(book.subjects),
+      book.author,
       book.genre,
-      book.description,
-      book.editionCount,
       book.isbn,
-      JSON.stringify(book.language),
-      book.publishDate,
-      book.publisher,
-      book.pages,
-      book.rating,
-      JSON.stringify(book.availability)
+      book.publishedYear,
+      book.description,
+      book.coverUrl,
+      book.rating
     ]);
   }
 
-  async getBooksByGenre(genre: string): Promise<Book[]> {
+  async getBooksByGenre(genre: string): Promise<BookEntity[]> {
     const result = await this.sqlite.executeQuery(
       'SELECT * FROM cached_books WHERE genre = ? ORDER BY title',
       [genre]
@@ -103,7 +90,7 @@ export class StorageService {
     return (result.values || []).map(this.mapRowToBook);
   }
 
-  async searchBooks(query: string): Promise<Book[]> {
+  async searchBooks(query: string): Promise<BookEntity[]> {
     const result = await this.sqlite.executeQuery(
       'SELECT * FROM cached_books WHERE title LIKE ? OR authors LIKE ? ORDER BY title',
       [`%${query}%`, `%${query}%`]
@@ -113,7 +100,7 @@ export class StorageService {
   }
 
   // Custom list operations
-  async createCustomList(list: Omit<CustomList, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
+  async createCustomList(list: Omit<CustomListEntity, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> {
     const id = Date.now().toString();
     await this.sqlite.executeRun(
       'INSERT INTO custom_lists (id, name, description) VALUES (?, ?, ?)',
@@ -122,7 +109,7 @@ export class StorageService {
     return id;
   }
 
-  async getCustomLists(): Promise<CustomList[]> {
+  async getCustomLists(): Promise<CustomListEntity[]> {
     const result = await this.sqlite.executeQuery(
       'SELECT * FROM custom_lists ORDER BY created_at DESC'
     );
@@ -158,7 +145,7 @@ export class StorageService {
     // list_books will be deleted automatically due to CASCADE
   }
 
-  async updateCustomList(listId: string, updates: Partial<CustomList>): Promise<void> {
+  async updateCustomList(listId: string, updates: Partial<CustomListEntity>): Promise<void> {
     const setClause = [];
     const values = [];
 
@@ -182,7 +169,7 @@ export class StorageService {
     }
   }
 
-  async getBooksInList(listId: string): Promise<Book[]> {
+  async getBooksInList(listId: string): Promise<BookEntity[]> {
     const result = await this.sqlite.executeQuery(`
       SELECT cb.* FROM cached_books cb
       INNER JOIN list_books lb ON cb.id = lb.book_id
@@ -206,26 +193,17 @@ export class StorageService {
     );
   }
 
-  private mapRowToBook(row: any): Book {
+  private mapRowToBook(row: any): BookEntity {
     return {
       id: row.id,
-      key: row.key,
       title: row.title,
-      authors: JSON.parse(row.authors || '[]'),
-      coverId: row.cover_id,
-      coverUrl: row.cover_url,
-      firstPublishYear: row.first_publish_year,
-      subjects: JSON.parse(row.subjects || '[]'),
+      author: row.author,
       genre: row.genre,
-      description: row.description,
-      editionCount: row.edition_count,
       isbn: row.isbn,
-      language: JSON.parse(row.language || '[]'),
-      publishDate: row.publish_date,
-      publisher: row.publisher,
-      pages: row.pages,
+      publishedYear: row.published_year,
+      description: row.description,
+      coverUrl: row.cover_url,
       rating: row.rating,
-      availability: JSON.parse(row.availability || '{}'),
       createdAt: new Date(row.created_at),
       updatedAt: new Date(row.updated_at)
     };

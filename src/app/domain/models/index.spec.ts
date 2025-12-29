@@ -48,11 +48,13 @@ describe('Domain Entities', () => {
       const category: CategoryEntity = {
         id: '1',
         name: 'Fiction',
+        key: 'fiction',
         createdAt: new Date()
       };
 
       expect(category.id).toBeDefined();
       expect(category.name).toBeDefined();
+      expect(category.key).toBeDefined();
       expect(category.createdAt).toBeInstanceOf(Date);
     });
   });
@@ -62,14 +64,14 @@ describe('Domain Entities', () => {
       const list: CustomListEntity = {
         id: '1',
         name: 'My Reading List',
-        bookIds: ['book1', 'book2'],
+        bookCount: 2,
         createdAt: new Date(),
         updatedAt: new Date()
       };
 
       expect(list.id).toBeDefined();
       expect(list.name).toBeDefined();
-      expect(list.bookIds).toEqual(['book1', 'book2']);
+      expect(list.bookCount).toBe(2);
       expect(list.createdAt).toBeInstanceOf(Date);
       expect(list.updatedAt).toBeInstanceOf(Date);
     });

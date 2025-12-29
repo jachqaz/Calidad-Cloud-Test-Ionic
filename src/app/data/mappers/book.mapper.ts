@@ -1,4 +1,4 @@
-import {Author, Book, BookAvailability} from '../../domain/entities/book.entity';
+import {BookEntity} from '../../domain/models';
 
 export interface OpenLibraryWork {
   key: string;
@@ -35,41 +35,28 @@ export interface OpenLibrarySearchDoc {
 }
 
 export class BookMapper {
-  static fromOpenLibraryWork(work: OpenLibraryWork, genre?: string): Book {
+  static fromOpenLibraryWork(work: OpenLibraryWork, genre?: string): BookEntity {
     return {
       id: this.extractIdFromKey(work.key),
-      key: work.key,
       title: work.title,
-      authors: this.mapAuthors(work.authors),
-      coverId: work.cover_id,
+      author: work.authors?.[0]?.name || 'Unknown Author',
+      genre: genre || 'Unknown',
+      publishedYear: work.first_publish_year,
       coverUrl: work.cover_id ? this.buildCoverUrl(work.cover_id) : undefined,
-      firstPublishYear: work.first_publish_year,
-      subjects: work.subject,
-      genre,
-      editionCount: work.edition_count,
-      availability: this.mapAvailability(work.availability),
       createdAt: new Date(),
       updatedAt: new Date()
     };
   }
 
-  static fromOpenLibrarySearchDoc(doc: OpenLibrarySearchDoc, genre?: string): Book {
+  static fromOpenLibrarySearchDoc(doc: OpenLibrarySearchDoc, genre?: string): BookEntity {
     return {
       id: this.extractIdFromKey(doc.key),
-      key: doc.key,
       title: doc.title,
-      authors: this.mapAuthorsFromSearch(doc.author_name, doc.author_key),
-      coverId: doc.cover_i,
-      coverUrl: doc.cover_i ? this.buildCoverUrl(doc.cover_i) : undefined,
-      firstPublishYear: doc.first_publish_year,
-      subjects: doc.subject,
-      genre,
-      editionCount: doc.edition_count,
+      author: doc.author_name?.[0] || 'Unknown Author',
+      genre: genre || 'Unknown',
       isbn: doc.isbn?.[0],
-      language: doc.language,
-      publisher: doc.publisher?.[0],
-      publishDate: doc.publish_date?.[0],
-      pages: doc.number_of_pages_median,
+      publishedYear: doc.first_publish_year,
+      coverUrl: doc.cover_i ? this.buildCoverUrl(doc.cover_i) : undefined,
       createdAt: new Date(),
       updatedAt: new Date()
     };
@@ -77,31 +64,6 @@ export class BookMapper {
 
   private static extractIdFromKey(key: string): string {
     return key.replace('/works/', '');
-  }
-
-  private static mapAuthors(authors?: { key: string; name: string }[]): Author[] {
-    if (!authors) return [];
-    return authors.map(author => ({
-      key: author.key,
-      name: author.name
-    }));
-  }
-
-  private static mapAuthorsFromSearch(names?: string[], keys?: string[]): Author[] {
-    if (!names) return [];
-    return names.map((name, index) => ({
-      key: keys?.[index] || '',
-      name
-    }));
-  }
-
-  private static mapAvailability(availability?: any): BookAvailability | undefined {
-    if (!availability) return undefined;
-    return {
-      status: availability.status || 'unknown',
-      isRestricted: availability.is_restricted || false,
-      isBrowseable: availability.is_browseable || false
-    };
   }
 
   private static buildCoverUrl(coverId: number, size: 'S' | 'M' | 'L' = 'M'): string {

@@ -1,0 +1,21 @@
+.settings-content {
+  .container {
+    padding: 16px;
+  }
+
+  .current-genres {
+    margin-top: 24px;
+
+    h3 {
+      margin-bottom: 12px;
+      color: var(--ion-color-dark);
+    }
+
+    .genre-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+  }
+}

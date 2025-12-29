@@ -29,8 +29,8 @@ export class ListRepositoryImpl implements ListRepository {
     };
 
     await this.sqliteService.executeRun(
-      'INSERT INTO custom_lists (id, name, description, book_ids, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
-      [id, list.name, list.description || '', JSON.stringify(list.bookIds), now, now]
+      'INSERT INTO custom_lists (id, name, description, book_count, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+      [id, list.name, list.description || '', list.bookCount || 0, now, now]
     );
 
     return newList;
@@ -64,14 +64,13 @@ export class ListRepositoryImpl implements ListRepository {
     }
 
     const updatedAt = new Date().toISOString();
-    const bookIds = list.bookIds ? JSON.stringify(list.bookIds) : JSON.stringify(existing.bookIds);
 
     await this.sqliteService.executeRun(
-      'UPDATE custom_lists SET name = ?, description = ?, book_ids = ?, updated_at = ? WHERE id = ?',
+      'UPDATE custom_lists SET name = ?, description = ?, book_count = ?, updated_at = ? WHERE id = ?',
       [
         list.name || existing.name,
         list.description !== undefined ? list.description : existing.description,
-        bookIds,
+        list.bookCount !== undefined ? list.bookCount : existing.bookCount,
         updatedAt,
         id
       ]
@@ -94,7 +93,7 @@ export class ListRepositoryImpl implements ListRepository {
       id: dbRow.id,
       name: dbRow.name,
       description: dbRow.description || undefined,
-      bookIds: JSON.parse(dbRow.book_ids),
+      bookCount: dbRow.book_count || 0,
       createdAt: new Date(dbRow.created_at),
       updatedAt: new Date(dbRow.updated_at)
     };

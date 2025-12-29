@@ -1,0 +1,62 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      Open Library Manager
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="openSettings()">
+        <ion-icon name="settings-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Open Library Manager</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div class="container">
+    <div class="welcome-section">
+      <h1>Welcome to your Library</h1>
+      <p>Explore your favorite genres</p>
+    </div>
+
+    @if (selectedGenres().length > 0) {
+      <ion-grid>
+        <ion-row>
+          @for (genre of selectedGenres(); track genre.id) {
+            <ion-col size="12" size-md="6">
+              <ion-card (click)="openGenre(genre)" button>
+                <ion-card-header>
+                  <ion-card-title>{{ genre.name }}</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  <ion-icon name="library-outline" size="large"></ion-icon>
+                  <p>Explore {{ genre.name.toLowerCase() }} books</p>
+                </ion-card-content>
+              </ion-card>
+            </ion-col>
+          }
+        </ion-row>
+      </ion-grid>
+    }
+
+    @if (selectedGenres().length === 0) {
+      <div class="empty-state">
+        <ion-icon name="library-outline" size="large"></ion-icon>
+        <h2>No genres selected</h2>
+        <p>Go to settings to select your favorite genres</p>
+        <ion-button (click)="openSettings()" fill="outline">
+          <ion-icon name="settings-outline" slot="start"></ion-icon>
+          Open Settings
+        </ion-button>
+      </div>
+    }
+  </div>
+</ion-content>

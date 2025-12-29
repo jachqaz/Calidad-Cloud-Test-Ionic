@@ -1,27 +1,27 @@
 import {TestBed} from '@angular/core/testing';
 import {StorageService} from './storage.service';
 import {SqliteService} from './sqlite.service';
-import {Book} from '../../domain/entities/book.entity';
-import {Genre} from '../../domain/entities/genre.entity';
+import {BookEntity} from '../../domain/models/book.entity';
+import {CategoryEntity} from '../../domain/models/category.entity';
 
 describe('StorageService', () => {
   let service: StorageService;
   let sqliteSpy: jasmine.SpyObj<SqliteService>;
 
-  const mockBook: Book = {
+  const mockBook: BookEntity = {
     id: 'test-book-1',
-    key: '/works/test-book-1',
     title: 'Test Book',
-    authors: [{key: '/authors/test', name: 'Test Author'}],
+    author: 'Test Author',
     genre: 'fiction',
     createdAt: new Date(),
     updatedAt: new Date()
   };
 
-  const mockGenre: Genre = {
+  const mockGenre: CategoryEntity = {
     id: '1',
     name: 'Fiction',
-    key: 'fiction'
+    key: 'fiction',
+    createdAt: new Date()
   };
 
   beforeEach(() => {
@@ -51,9 +51,8 @@ describe('StorageService', () => {
       sqliteSpy.executeQuery.and.returnValue(Promise.resolve({
         values: [{
           id: 'test-book-1',
-          key: '/works/test-book-1',
           title: 'Test Book',
-          authors: JSON.stringify([{key: '/authors/test', name: 'Test Author'}]),
+          author: 'Test Author',
           genre: 'fiction',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
@@ -81,9 +80,8 @@ describe('StorageService', () => {
       sqliteSpy.executeQuery.and.returnValue(Promise.resolve({
         values: [{
           id: 'test-book-1',
-          key: '/works/test-book-1',
           title: 'Test Book',
-          authors: JSON.stringify([{key: '/authors/test', name: 'Test Author'}]),
+          author: 'Test Author',
           genre: 'fiction',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
@@ -154,9 +152,8 @@ describe('StorageService', () => {
       sqliteSpy.executeQuery.and.returnValue(Promise.resolve({
         values: [{
           id: 'test-book-1',
-          key: '/works/test-book-1',
           title: 'Test Book',
-          authors: JSON.stringify([{key: '/authors/test', name: 'Test Author'}]),
+          author: 'Test Author',
           genre: 'fiction',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()

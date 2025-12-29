@@ -1,0 +1,67 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>My Lists</ion-title>
+    <ion-buttons slot="end">
+      @if (customLists().length < MAX_CUSTOM_LISTS) {
+        <ion-button (click)="createList()">
+          <ion-icon name="add-outline"></ion-icon>
+        </ion-button>
+      }
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="my-books-content">
+  <div class="container">
+    @if (isLoading()) {
+      <div class="loading-state">
+        <ion-spinner></ion-spinner>
+        <p>Loading lists...</p>
+      </div>
+    }
+
+    @if (!isLoading() && customLists().length === 0) {
+      <div class="empty-state">
+        <ion-icon name="library-outline" size="large"></ion-icon>
+        <h2>No lists yet</h2>
+        <p>Create your first custom list to organize your favorite books</p>
+        <ion-button (click)="createList()" fill="outline">
+          <ion-icon name="add-outline" slot="start"></ion-icon>
+          Create List
+        </ion-button>
+      </div>
+    }
+
+    @if (customLists().length > 0) {
+      <ion-list>
+        @for (list of customLists(); track list.id) {
+          <ion-item (click)="openList(list)" button>
+            <ion-icon color="primary" name="library-outline" slot="start"></ion-icon>
+            <ion-label>
+              <h2>{{ list.name }}</h2>
+              <p>{{ list.bookCount }} {{ list.bookCount === 1 ? 'book' : 'books' }}</p>
+              @if (list.description) {
+                <p>{{ list.description }}</p>
+              }
+            </ion-label>
+            <ion-button
+              (click)="showListOptions(list, $event)"
+              fill="clear"
+              slot="end">
+              <ion-icon name="ellipsis-vertical-outline"></ion-icon>
+            </ion-button>
+          </ion-item>
+        }
+      </ion-list>
+
+      <div class="list-info">
+        <ion-note>
+          {{ customLists().length }}/{{ MAX_CUSTOM_LISTS }} lists created
+        </ion-note>
+      </div>
+    }
+  </div>
+</ion-content>

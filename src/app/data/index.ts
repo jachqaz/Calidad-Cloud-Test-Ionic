@@ -1,4 +1,3 @@
-export * from './services/network.service';
 export * from './services/sqlite.service';
 export * from './sources/open-library.data-source';
 export * from './sources/open-library.interface';

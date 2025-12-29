@@ -5,7 +5,6 @@ import {ConnectivityService} from '../services/connectivity.service';
 import {StorageService} from '../services/storage.service';
 import {OpenLibraryDataSource} from '../sources/open-library.data-source';
 import {BookMapper} from '../mappers/book.mapper';
-import {BookEntityMapper} from '../mappers/book-entity.mapper';
 
 @Injectable({
   providedIn: 'root'
@@ -27,15 +26,14 @@ export class BookRepositoryImpl implements BookRepository {
           for (const book of books) {
             await this.storage.saveBook(book);
           }
-          return BookEntityMapper.fromBooks(books);
+          return books;
         }
       } catch (error) {
         console.warn('API search failed, falling back to local:', error);
       }
     }
 
-    const books = await this.storage.searchBooks(query);
-    return BookEntityMapper.fromBooks(books);
+    return await this.storage.searchBooks(query);
   }
 
   async getByGenre(genre: string): Promise<BookEntity[]> {
@@ -47,25 +45,22 @@ export class BookRepositoryImpl implements BookRepository {
           for (const book of books) {
             await this.storage.saveBook(book);
           }
-          return BookEntityMapper.fromBooks(books);
+          return books;
         }
       } catch (error) {
         console.warn('API genre search failed, falling back to local:', error);
       }
     }
 
-    const books = await this.storage.getBooksByGenre(genre);
-    return BookEntityMapper.fromBooks(books);
+    return await this.storage.getBooksByGenre(genre);
   }
 
   async getById(id: string): Promise<BookEntity | null> {
     const books = await this.storage.searchBooks(id);
-    const book = books.find(book => book.id === id);
-    return book ? BookEntityMapper.fromBook(book) : null;
+    return books.find(book => book.id === id) || null;
   }
 
   async getAll(): Promise<BookEntity[]> {
-    const books = await this.storage.searchBooks('');
-    return BookEntityMapper.fromBooks(books);
+    return await this.storage.searchBooks('');
   }
 }
