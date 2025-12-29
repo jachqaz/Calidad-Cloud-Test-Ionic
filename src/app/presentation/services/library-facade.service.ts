@@ -1,8 +1,9 @@
-import {Injectable} from '@angular/core';
+import {Inject, Injectable} from '@angular/core';
 import {BookStateService} from '../state/book-state.service';
 import {ListStateService} from '../state/list-state.service';
 import {BookEntity, CustomListEntity} from '../../domain/models';
 import {BookRepository} from '../../domain/repositories';
+import {BOOK_REPOSITORY_TOKEN} from '../../domain/tokens/book-repository.token';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ export class LibraryFacadeService {
   constructor(
     private bookStateService: BookStateService,
     private listStateService: ListStateService,
-    private bookRepository: BookRepository
+    @Inject(BOOK_REPOSITORY_TOKEN) private bookRepository: BookRepository
   ) {
   }
 

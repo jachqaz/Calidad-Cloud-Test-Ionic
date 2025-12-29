@@ -1,6 +1,7 @@
-import {computed, Injectable, signal} from '@angular/core';
+import {computed, Inject, Injectable, signal} from '@angular/core';
 import {CustomListEntity} from '../../domain/models';
 import {ListRepository} from '../../domain/repositories';
+import {LIST_REPOSITORY_TOKEN} from '../../domain/tokens/list-repository.token';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +21,7 @@ export class ListStateService {
   private readonly _selectedList = signal<CustomListEntity | null>(null);
   readonly selectedList = this._selectedList.asReadonly();
 
-  constructor(private listRepository: ListRepository) {
+  constructor(@Inject(LIST_REPOSITORY_TOKEN) private listRepository: ListRepository) {
     this.loadLists();
   }
 
@@ -173,7 +174,9 @@ export class ListStateService {
   }
 
   private validateListName(name: string): boolean {
-    return name && name.trim().length >= 2 && name.trim().length <= 50;
+    if (!name) return false;
+    const trimmed = name.trim();
+    return trimmed.length >= 2 && trimmed.length <= 50;
   }
 
   private isNameDuplicate(name: string, excludeId?: string): boolean {

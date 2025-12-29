@@ -1,7 +1,8 @@
-import {computed, Injectable, signal} from '@angular/core';
+import {computed, Inject, Injectable, signal} from '@angular/core';
 import {BookEntity} from '../../domain/models';
 import {BookRepository} from '../../domain/repositories';
 import {GetBooksByGenreUseCase} from '../../domain/use-cases';
+import {BOOK_REPOSITORY_TOKEN} from '../../domain/tokens/book-repository.token';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +22,7 @@ export class BookStateService {
   readonly selectedBook = this._selectedBook.asReadonly();
   private getBooksByGenreUseCase: GetBooksByGenreUseCase;
 
-  constructor(private bookRepository: BookRepository) {
+  constructor(@Inject(BOOK_REPOSITORY_TOKEN) private bookRepository: BookRepository) {
     this.getBooksByGenreUseCase = new GetBooksByGenreUseCase(this.bookRepository);
   }
 

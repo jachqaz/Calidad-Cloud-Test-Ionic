@@ -1,14 +1,16 @@
 import {Provider} from '@angular/core';
-import {BookRepository, ListRepository} from '../domain/repositories';
-import {BookRepositoryImpl, ListRepositoryImpl} from './repositories/book-repository.impl';
+import {BookRepositoryImpl} from './repositories/book-repository.impl';
+import {ListRepositoryImpl} from './repositories/list-repository.impl';
+import {BOOK_REPOSITORY_TOKEN} from '../domain/tokens/book-repository.token';
+import {LIST_REPOSITORY_TOKEN} from '../domain/tokens/list-repository.token';
 
 export const DATA_PROVIDERS: Provider[] = [
   {
-    provide: BookRepository,
+    provide: BOOK_REPOSITORY_TOKEN,
     useClass: BookRepositoryImpl
   },
   {
-    provide: ListRepository,
+    provide: LIST_REPOSITORY_TOKEN,
     useClass: ListRepositoryImpl
   }
 ];

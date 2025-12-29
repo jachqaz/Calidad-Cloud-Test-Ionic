@@ -4,6 +4,7 @@ import {IonicModule, ToastController} from '@ionic/angular';
 import {ActivatedRoute, Router} from '@angular/router';
 import {LibraryFacadeService} from '../services/library-facade.service';
 import {BookEntity, CustomListEntity} from '../../domain/models';
+import {Haptics, ImpactStyle} from '@capacitor/haptics';
 
 @Component({
   selector: 'app-book-detail',
@@ -38,7 +39,8 @@ import {BookEntity, CustomListEntity} from '../../domain/models';
           </div>
           <div class="content-skeleton">
             <ion-skeleton-text animated style="width: 100%; height: 1rem;"
-                               *for="let line of skeletonLines"></ion-skeleton-text>
+                               @for(line of skeletonLines; track $index) {}
+                               ></ion-skeleton-text>
           </div>
         </div>
 
@@ -110,8 +112,8 @@ import {BookEntity, CustomListEntity} from '../../domain/models';
 
               <div *ngIf="libraryFacade.listState.hasLists()">
                 <ion-list>
+                  @for(list of libraryFacade.listState.lists(); track list.id) {
                   <ion-item
-                    *for="let list of libraryFacade.listState.lists()"
                     button
                     (click)="addToList(list)"
                     [disabled]="isBookInList(list)">
@@ -131,6 +133,7 @@ import {BookEntity, CustomListEntity} from '../../domain/models';
                       Added
                     </ion-badge>
                   </ion-item>
+                  }
                 </ion-list>
 
                 <div class="modal-actions" *ngIf="libraryFacade.listState.canCreateNewList()">
@@ -198,7 +201,7 @@ export class BookDetailPage implements OnInit {
 
     try {
       await this.libraryFacade.addBookToList(list.id, currentBook.id);
-      await this.showSuccessToast(\`Added to "\${list.name}"\`);
+      await this.showSuccessToast(`Added to "${list.name}"`);
       await this.triggerHapticFeedback();
       this.closeAddToListModal();
     } catch (error) {
@@ -245,9 +248,6 @@ export class BookDetailPage implements OnInit {
       // Haptics not available on this platform
     }
   }
-}
-
-
   private async loadBook(bookId: string) {
     // In a real app, load book by ID from repository
     // For now, use the selected book from state
@@ -256,3 +256,4 @@ export class BookDetailPage implements OnInit {
       this.book.set(selectedBook);
     }
   }
+}

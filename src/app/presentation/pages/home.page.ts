@@ -27,8 +27,8 @@ import {BookEntity} from '../../domain/models';
         <div class="genres-section">
           <h2>Explore Genres</h2>
           <div class="genres-grid">
+            @for(genre of genres(); track genre.key) {
             <ion-card
-              *for="let genre of genres()"
               (click)="loadGenre(genre.key)"
               class="genre-card"
               [class.active]="selectedGenre() === genre.key">
@@ -38,6 +38,7 @@ import {BookEntity} from '../../domain/models';
                 <p>{{ genre.description }}</p>
               </ion-card-content>
             </ion-card>
+            }
           </div>
         </div>
 
@@ -47,19 +48,21 @@ import {BookEntity} from '../../domain/models';
 
           <!-- Loading Skeletons -->
           <div *ngIf="libraryFacade.bookState.isLoading()" class="books-grid">
-            <ion-card *for="let item of skeletonItems">
+            @for(item of skeletonItems; track $index) {
+            <ion-card>
               <ion-skeleton-text animated style="height: 200px;"></ion-skeleton-text>
               <ion-card-content>
                 <ion-skeleton-text animated style="width: 80%;"></ion-skeleton-text>
                 <ion-skeleton-text animated style="width: 60%;"></ion-skeleton-text>
               </ion-card-content>
             </ion-card>
+            }
           </div>
 
           <!-- Books Grid -->
           <div *ngIf="!libraryFacade.bookState.isLoading()" class="books-grid">
+            @for(book of libraryFacade.bookState.books(); track book.id) {
             <ion-card
-              *for="let book of libraryFacade.bookState.books()"
               (click)="openBookDetail(book)"
               class="book-card">
               <img
@@ -72,6 +75,7 @@ import {BookEntity} from '../../domain/models';
                 <ion-badge color="primary">{{ book.genre }}</ion-badge>
               </ion-card-content>
             </ion-card>
+            }
           </div>
 
           <!-- Infinite Scroll -->
