@@ -43,14 +43,13 @@ export interface OpenLibrarySearchDoc {
 export class BookMapper {
   static fromOpenLibraryWork(work: OpenLibraryWork, genre?: string): BookEntity {
     const authorName = work.authors?.[0]?.name ||
-      (work.authors?.[0] as any)?.author?.name ||
-      'Unknown Author';
+        (work.authors?.[0] as any)?.author?.name;
 
     return {
       id: this.extractIdFromKey(work.key),
       title: work.title,
       author: authorName,
-      genre: genre || 'Unknown',
+      genre: genre,
       publishedYear: work.first_publish_year,
       coverUrl: work.covers?.[0] ? this.buildCoverUrl(work.covers[0]) : (work.cover_id ? this.buildCoverUrl(work.cover_id) : undefined),
       description: this.extractDescription(work.description),
@@ -67,8 +66,8 @@ export class BookMapper {
     return {
       id: this.extractIdFromKey(doc.key),
       title: doc.title,
-      author: doc.author_name?.[0] || 'Unknown Author',
-      genre: genre || 'Unknown',
+      author: doc.author_name?.[0],
+      genre: genre,
       isbn: doc.isbn?.[0],
       publishedYear: doc.first_publish_year,
       coverUrl: doc.cover_i ? this.buildCoverUrl(doc.cover_i) : undefined,

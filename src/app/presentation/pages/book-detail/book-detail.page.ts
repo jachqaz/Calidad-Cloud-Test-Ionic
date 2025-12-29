@@ -29,9 +29,8 @@ export class BookDetailPage implements OnInit {
 
   async ngOnInit() {
     this.bookId = this.route.snapshot.paramMap.get('id') || '';
-    if (!this.selectedBook()) {
-      await this.libraryFacade.loadBookDetail(this.bookId);
-    }
+    // Always load full details to ensure complete data
+    await this.libraryFacade.loadBookDetail(this.bookId);
   }
 
   async openAddToListModal() {
