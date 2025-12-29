@@ -4,6 +4,7 @@ import {IonicModule} from '@ionic/angular';
 import {CommonModule} from '@angular/common';
 import {AVAILABLE_GENRES, CategoryEntity} from '../../../domain/models';
 import {StorageService} from '../../../data/services/storage.service';
+import {I18nService} from '../../services/i18n.service';
 
 @Component({
   selector: 'app-genre-selection',
@@ -22,7 +23,8 @@ export class GenreSelectionPage implements OnInit {
   constructor(
     private storage: StorageService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    public i18n: I18nService
   ) {
   }
 

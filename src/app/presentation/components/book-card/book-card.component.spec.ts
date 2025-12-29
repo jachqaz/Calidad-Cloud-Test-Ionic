@@ -56,7 +56,7 @@ describe('BookCardComponent', () => {
     fixture.detectChanges();
 
     const img = fixture.nativeElement.querySelector('.book-cover');
-    expect(img.src).toContain('book-placeholder.png');
+    expect(img.src).toContain('book-placeholder.svg');
   });
 
   it('should not show rating when not provided', () => {

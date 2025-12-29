@@ -1,9 +1,10 @@
-import {Component} from '@angular/core';
+import {Component, computed} from '@angular/core';
 import {IonicModule} from '@ionic/angular';
 import {CommonModule} from '@angular/common';
 import {RouterModule} from '@angular/router';
 import {addIcons} from 'ionicons';
 import {bookmarksOutline, homeOutline, searchOutline, settingsOutline} from 'ionicons/icons';
+import {I18nService} from '../../services/i18n.service';
 
 @Component({
   selector: 'app-shell',
@@ -13,14 +14,14 @@ import {bookmarksOutline, homeOutline, searchOutline, settingsOutline} from 'ion
   styleUrls: ['./app-shell.component.scss']
 })
 export class AppShellComponent {
-  public appPages = [
-    {title: 'Home', url: '/home', icon: 'home-outline'},
-    {title: 'Search', url: '/search', icon: 'search-outline'},
-    {title: 'My Lists', url: '/my-books', icon: 'bookmarks-outline'},
-    {title: 'Settings', url: '/settings', icon: 'settings-outline'}
-  ];
+  public appPages = computed(() => [
+    {title: this.i18n.t('nav.home'), url: '/home', icon: 'home-outline'},
+    {title: this.i18n.t('nav.search'), url: '/search', icon: 'search-outline'},
+    {title: this.i18n.t('nav.my-books'), url: '/my-books', icon: 'bookmarks-outline'},
+    {title: this.i18n.t('nav.settings'), url: '/settings', icon: 'settings-outline'}
+  ]);
 
-  constructor() {
+  constructor(public i18n: I18nService) {
     addIcons({homeOutline, searchOutline, bookmarksOutline, settingsOutline});
   }
 

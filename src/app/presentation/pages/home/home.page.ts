@@ -22,6 +22,7 @@ import {CategoryEntity} from '../../../domain/models';
 import {StorageService} from '../../../data/services/storage.service';
 import {addIcons} from 'ionicons';
 import {libraryOutline, settingsOutline} from 'ionicons/icons';
+import {I18nService} from '../../services/i18n.service';
 
 @Component({
   selector: 'app-home',
@@ -34,7 +35,8 @@ export class HomePage implements OnInit {
 
   constructor(
     private router: Router,
-    private storage: StorageService
+    private storage: StorageService,
+    public i18n: I18nService
   ) {
     addIcons({settingsOutline, libraryOutline});
   }

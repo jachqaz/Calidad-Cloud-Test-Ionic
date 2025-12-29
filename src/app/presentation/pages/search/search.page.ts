@@ -1,10 +1,11 @@
-import {Component, signal, ViewChild} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {IonicModule, IonInfiniteScroll} from '@ionic/angular';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {Router} from '@angular/router';
 import {BookEntity} from '../../../domain/models';
 import {LibraryFacadeService} from '../../services/library-facade.service';
+import {I18nService} from '../../services/i18n.service';
 
 @Component({
   selector: 'app-search',
@@ -20,7 +21,8 @@ export class SearchPage {
 
   constructor(
     protected libraryFacade: LibraryFacadeService,
-    private router: Router
+    private router: Router,
+    public i18n: I18nService
   ) {
   }
 

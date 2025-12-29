@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Select 4 Genres</ion-title>
+    <ion-title>{{ i18n.t('genre.title') }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -29,14 +29,14 @@
     </div>
 
     <div class="selection-info">
-      <p>{{ selectedCount() }}/4 genres selected</p>
+      <p>{{ selectedCount() }}/4 {{ i18n.t('genre.selected') }}</p>
     </div>
 
     <ion-button
       (click)="saveAndContinue()"
       [disabled]="!canContinue()"
       expand="block">
-      Continue
+      {{ i18n.t('genre.continue') }}
     </ion-button>
   </div>
 </ion-content>

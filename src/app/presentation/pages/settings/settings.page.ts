@@ -4,6 +4,9 @@ import {IonicModule} from '@ionic/angular';
 import {CommonModule} from '@angular/common';
 import {StorageService} from '../../../data/services/storage.service';
 import {CategoryEntity} from '../../../domain/models';
+import {I18nService, Language} from '../../services/i18n.service';
+import {addIcons} from 'ionicons';
+import {chevronForward, languageOutline, libraryOutline} from 'ionicons/icons';
 
 @Component({
   selector: 'app-settings',
@@ -17,8 +20,14 @@ export class SettingsPage implements OnInit {
 
   constructor(
     private storage: StorageService,
-    private router: Router
+    private router: Router,
+    public i18n: I18nService
   ) {
+    addIcons({languageOutline, libraryOutline, chevronForward});
+  }
+
+  changeLanguage(lang: Language) {
+    this.i18n.setLanguage(lang);
   }
 
   async ngOnInit() {

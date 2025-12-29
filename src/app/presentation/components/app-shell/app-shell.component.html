@@ -2,9 +2,9 @@
   <ion-menu contentId="main-content" type="overlay">
     <ion-content>
       <ion-list id="inbox-list">
-        <ion-list-header>Library</ion-list-header>
+        <ion-list-header>{{ i18n.t('home.title') }}</ion-list-header>
 
-        <ion-menu-toggle *ngFor="let p of appPages; trackBy: trackItems" auto-hide="false">
+        <ion-menu-toggle *ngFor="let p of appPages(); trackBy: trackItems" auto-hide="false">
           <ion-item
             [routerLink]="[p.url]"
             detail="false"

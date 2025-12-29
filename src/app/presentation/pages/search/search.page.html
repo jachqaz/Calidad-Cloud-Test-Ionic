@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>Search Books</ion-title>
+    <ion-title>{{ i18n.t('search.title') }}</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="clearSearch()">
         <ion-icon name="close-outline"></ion-icon>
@@ -20,7 +20,7 @@
         (ionInput)="onSearchInput($event)"
         [(ngModel)]="searchQuery"
         debounce="500"
-        placeholder="Search by title, author or ISBN">
+        [placeholder]="i18n.t('search.placeholder')">
       </ion-searchbar>
     </div>
 
@@ -28,7 +28,7 @@
     @if (libraryFacade.bookState.isLoading() && libraryFacade.bookState.books().length === 0) {
       <div class="loading-state">
         <ion-spinner></ion-spinner>
-        <p>Searching books...</p>
+        <p>{{ i18n.t('common.loading') }}</p>
       </div>
     }
 
@@ -36,8 +36,8 @@
     @if (!libraryFacade.bookState.isLoading() && !libraryFacade.bookState.hasBooks() && searchQuery.length > 0) {
       <div class="empty-state">
         <ion-icon name="search-outline" size="large"></ion-icon>
-        <h3>No results</h3>
-        <p>No books found for "{{ searchQuery }}"</p>
+        <h3>{{ i18n.t('search.no-results') }}</h3>
+        <p>{{ i18n.t('search.try-different') }}</p>
       </div>
     }
 
@@ -45,8 +45,8 @@
     @if (searchQuery.length === 0) {
       <div class="initial-state">
         <ion-icon name="search-outline" size="large"></ion-icon>
-        <h2>Search Books</h2>
-        <p>Enter the title, author or ISBN of the book you're looking for</p>
+        <h2>{{ i18n.t('search.title') }}</h2>
+        <p>{{ i18n.t('search.placeholder') }}</p>
       </div>
     }
 
@@ -73,7 +73,7 @@
         [disabled]="!canLoadMore()">
         <ion-infinite-scroll-content
           loadingSpinner="bubbles"
-          loadingText="Loading more results...">
+          [loadingText]="i18n.t('common.loading')">
         </ion-infinite-scroll-content>
       </ion-infinite-scroll>
     }
@@ -82,9 +82,9 @@
     @if (libraryFacade.bookState.hasError()) {
       <div class="error-state">
         <ion-icon class="error-icon" name="alert-circle-outline"></ion-icon>
-        <h3>Something went wrong</h3>
+        <h3>{{ i18n.t('common.error') }}</h3>
         <p>{{ libraryFacade.bookState.errorMessage() }}</p>
-        <ion-button (click)="retry()" fill="outline">Try Again</ion-button>
+        <ion-button (click)="retry()" fill="outline">{{ i18n.t('common.retry') }}</ion-button>
       </div>
     }
   </div>

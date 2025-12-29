@@ -3,6 +3,7 @@ import {StorageService} from './storage.service';
 import {SqliteService} from './sqlite.service';
 import {BookEntity} from '../../domain/models/book.entity';
 import {CategoryEntity} from '../../domain/models/category.entity';
+import {Capacitor} from '@capacitor/core';
 
 describe('StorageService', () => {
   let service: StorageService;
@@ -36,6 +37,16 @@ describe('StorageService', () => {
 
     service = TestBed.inject(StorageService);
     sqliteSpy = TestBed.inject(SqliteService) as jasmine.SpyObj<SqliteService>;
+
+    // Mock Capacitor to return true for native platform
+    spyOn(Capacitor, 'isNativePlatform').and.returnValue(true);
+
+    // Clear localStorage
+    localStorage.clear();
+  });
+
+  afterEach(() => {
+    localStorage.clear();
   });
 
   it('should be created', () => {
@@ -142,6 +153,10 @@ describe('StorageService', () => {
 
       await service.addBookToList('list-1', 'book-1');
 
+      expect(sqliteSpy.executeQuery).toHaveBeenCalledWith(
+        'SELECT id FROM list_books WHERE list_id = ? AND book_id = ?',
+        ['list-1', 'book-1']
+      );
       expect(sqliteSpy.executeRun).toHaveBeenCalledWith(
         'INSERT INTO list_books (id, list_id, book_id) VALUES (?, ?, ?)',
         [jasmine.any(String), 'list-1', 'book-1']

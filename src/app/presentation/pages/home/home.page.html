@@ -4,7 +4,7 @@
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
     <ion-title>
-      Open Library Manager
+      {{ i18n.t('home.title') }}
     </ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="openSettings()">
@@ -17,14 +17,14 @@
 <ion-content [fullscreen]="true">
   <ion-header collapse="condense">
     <ion-toolbar>
-      <ion-title size="large">Open Library Manager</ion-title>
+      <ion-title size="large">{{ i18n.t('home.title') }}</ion-title>
     </ion-toolbar>
   </ion-header>
 
   <div class="container">
     <div class="welcome-section">
-      <h1>Welcome to your Library</h1>
-      <p>Explore your favorite genres</p>
+      <h1>{{ i18n.t('home.welcome') }}</h1>
+      <p>{{ i18n.t('home.explore') }}</p>
     </div>
 
     @if (selectedGenres().length > 0) {
@@ -38,7 +38,7 @@
                 </ion-card-header>
                 <ion-card-content>
                   <ion-icon [name]="genre.icon || 'library-outline'" size="large"></ion-icon>
-                  <p>Explore {{ genre.name.toLowerCase() }} books</p>
+                  <p>{{ i18n.t('home.explore-genre') }} {{ genre.name.toLowerCase() }}</p>
                 </ion-card-content>
               </ion-card>
             </ion-col>
@@ -50,11 +50,11 @@
     @if (selectedGenres().length === 0) {
       <div class="empty-state">
         <ion-icon name="library-outline" size="large"></ion-icon>
-        <h2>No genres selected</h2>
-        <p>Go to settings to select your favorite genres</p>
+        <h2>{{ i18n.t('home.no-genres') }}</h2>
+        <p>{{ i18n.t('home.go-settings') }}</p>
         <ion-button (click)="openSettings()" fill="outline">
           <ion-icon name="settings-outline" slot="start"></ion-icon>
-          Open Settings
+          {{ i18n.t('home.open-settings') }}
         </ion-button>
       </div>
     }
