@@ -1,10 +1,10 @@
 import {Component} from '@angular/core';
-import {AppShell} from './presentation/components/app-shell.component';
+import {AppShellComponent} from './presentation/components/app-shell.component';
 
 @Component({
   selector: 'app-root',
   template: '<app-shell></app-shell>',
-  imports: [AppShell],
+  imports: [AppShellComponent],
 })
 export class AppComponent {
   constructor() {}

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {IonicModule} from '@ionic/angular';
 import {CommonModule} from '@angular/common';
 import {RouterModule} from '@angular/router';
@@ -143,7 +143,7 @@ import {bookmarksOutline, homeOutline, searchOutline, settingsOutline} from 'ion
     }
   `]
 })
-export class AppShell implements OnInit {
+export class AppShellComponent {
   public appPages = [
     {title: 'Inicio', url: '/home', icon: 'home-outline'},
     {title: 'Buscar', url: '/search', icon: 'search-outline'},
@@ -153,9 +153,6 @@ export class AppShell implements OnInit {
 
   constructor() {
     addIcons({homeOutline, searchOutline, bookmarksOutline, settingsOutline});
-  }
-
-  ngOnInit() {
   }
 
   trackItems(index: number, item: any) {
